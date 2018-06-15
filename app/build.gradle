@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.whut.umrhamster.weatherforecast"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -26,5 +26,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compile 'com.android.support:design:26.1.0'
+    compile 'com.squareup.okhttp3:okhttp:3.10.0'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'org.litepal.android:core:2.0.0'
     implementation files('libs/BaiduLBS_Android.jar')
+    implementation files('libs/sdk_HeWeather_Public_Android_V122.jar')
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
 }

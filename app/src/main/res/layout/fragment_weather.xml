@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/main_bg"
+    android:background="@android:color/transparent"
     android:fitsSystemWindows="true"
     tools:context="com.whut.umrhamster.weatherforecast.MainActivity">
     <android.support.v4.widget.NestedScrollView
@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="200dp"
+            android:layout_marginStart="10dp"
             android:orientation="vertical">
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -23,7 +24,6 @@
                     android:id="@+id/weather_fg_temperature"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:text="30"
                     android:textColor="@android:color/white"
                     android:textSize="70sp"
@@ -48,6 +48,24 @@
                     android:layout_toEndOf="@id/weather_fg_temperature"
                     android:layout_alignBaseline="@id/weather_fg_temperature"/>
             </RelativeLayout>
+            <TextView
+                android:id="@+id/weather_fg_wctemperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/WCTemperature"
+                android:textColor="@android:color/white"/>
+            <TextView
+                android:id="@+id/weather_fg_windcondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="南风4级"
+                android:textColor="@android:color/white"/>
+            <TextView
+                android:id="@+id/weather_fg_lunardate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lunardate"
+                android:textColor="@android:color/white"/>
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
