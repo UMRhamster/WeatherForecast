@@ -47,8 +47,6 @@
 
         <activity android:name=".View.CitySearchActivity" />
         <activity android:name=".View.CityChooseActivity" />
-        <activity android:name=".View.ProvinceChooseActivity" />
-        <activity android:name=".View.DistrictChooseActivity"></activity>
     </application>
 
 </manifest>

@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.whut.umrhamster.weatherforecast.View.CitySearchActivity">
+    android:layout_height="match_parent">
     <android.support.v7.widget.Toolbar
-        android:id="@+id/ac_citysearch_tb"
+        android:id="@+id/fg_city_citysearch_tb"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/citySearchtb">
@@ -16,15 +13,17 @@
             android:layout_height="28dp"
             android:src="@drawable/back"/>
         <TextView
+            android:id="@+id/fg_city_choose_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择城市"
+            android:text="城市"
             android:textSize="20sp"
             android:textColor="@android:color/black"
             android:layout_gravity="center"/>
     </android.support.v7.widget.Toolbar>
     <LinearLayout
-        android:layout_below="@id/ac_citysearch_tb"
+        android:id="@+id/fg_city_choose_ll"
+        android:layout_below="@id/fg_city_citysearch_tb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -44,6 +43,7 @@
                 android:src="@drawable/search"
                 android:layout_gravity="center"/>
             <EditText
+                android:id="@+id/fg_city_search_et"
                 android:layout_width="wrap_content"
                 android:layout_height="26dp"
                 android:layout_marginStart="2dp"
@@ -60,15 +60,12 @@
             android:layout_height="0.5dp"
             android:background="#cfd1d1"/>
     </LinearLayout>
-    <Button
-        android:id="@+id/ac_citysearch_morecity_btn"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fg_city_choose_rv"
+        android:layout_below="@id/fg_city_choose_ll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="更多城市"
-        android:textColor="@android:color/black"
-        android:textSize="15sp"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
-        style="?android:attr/borderlessButtonStyle"
-        android:background="@drawable/morecity_btn_bg"/>
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
 </RelativeLayout>
