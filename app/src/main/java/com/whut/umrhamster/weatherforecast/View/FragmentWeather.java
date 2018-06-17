@@ -1,5 +1,6 @@
 package com.whut.umrhamster.weatherforecast.View;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.whut.umrhamster.weatherforecast.MainActivity;
 import com.whut.umrhamster.weatherforecast.Model.DailyWeather;
 import com.whut.umrhamster.weatherforecast.Model.Lunar;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
@@ -70,6 +72,7 @@ public class FragmentWeather extends Fragment {
                     response = okHttpClient.newCall(request).execute();
                     String json = response.body().string();
                     weather = Utils.Json2Weather(json);
+                    Log.d("FragmentWeatherinitData",weather.getCity());
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -96,5 +99,10 @@ public class FragmentWeather extends Fragment {
 
     public Weather getWeather() {
         return weather;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
     }
 }

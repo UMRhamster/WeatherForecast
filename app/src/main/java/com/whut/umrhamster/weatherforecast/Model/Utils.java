@@ -1,5 +1,6 @@
 package com.whut.umrhamster.weatherforecast.Model;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -190,5 +191,14 @@ public class Utils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+    public static int dp2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
+    }
+
+    //修正城市名，去除“市”、“区”等  例如，武汉市->武汉
+    public static String correctCityName(String cityName){
+        return cityName.replace("市","");
     }
 }

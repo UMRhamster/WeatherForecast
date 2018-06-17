@@ -7,8 +7,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -16,6 +20,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.whut.umrhamster.weatherforecast.Model.District;
+import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.View.CitySearchActivity;
 import com.whut.umrhamster.weatherforecast.View.FragmentWeather;
 import com.whut.umrhamster.weatherforecast.View.MyFragmentPagerView;
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private MyFragmentPagerView myFragmentPagerView;
     private List<Fragment> fragmentList;   //用于存储显示天气预报的fragment
     private boolean isLocated = false;             //是否第一次定位
+    private LinearLayout linearLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.main_tb);
         textViewTitle = findViewById(R.id.main_cityname_tv);
         viewPager = findViewById(R.id.main_vp);
+        linearLayout = findViewById(R.id.main_tb_ll);
         fragmentList = new ArrayList<>();
         myFragmentPagerView = new MyFragmentPagerView(getSupportFragmentManager(),fragmentList);
         viewPager.setAdapter(myFragmentPagerView);
@@ -72,14 +79,14 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, CitySearchActivity.class));
+                startActivityForResult(new Intent(MainActivity.this, CitySearchActivity.class),3);
                 overridePendingTransition(R.anim.anim_fg_enter,R.anim.anim_do_nothing);
             }
         });
         textViewTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,CitySearchActivity.class));
+                startActivityForResult(new Intent(MainActivity.this,CitySearchActivity.class),3);
                 overridePendingTransition(R.anim.anim_fg_enter,R.anim.anim_do_nothing);
             }
         });
@@ -91,7 +98,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
+                Log.d("MainActivity","onPageSelected");
                 textViewTitle.setText(((FragmentWeather)fragmentList.get(position)).getWeather().getCity());
+                ((ImageView)linearLayout.getChildAt(position)).setImageResource(R.drawable.point_bright);
+                for (int i=0;i<linearLayout.getChildCount();i++){
+                    if (i !=position )
+                    ((ImageView)linearLayout.getChildAt(i)).setImageResource(R.drawable.point_dark);
+                }
 //                Log.d("MainActivity",((FragmentWeather)fragmentList.get(position)).getWeather().getCity());
             }
 
@@ -105,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             if (!isLocated){
-                textViewTitle.setText(bdLocation.getCity());    //获得地区名，例如：武昌区
+                textViewTitle.setText(Utils.correctCityName(bdLocation.getCity()));    //获得地区名，例如：武昌区
                 //通过定位获得地区名，创建fragment
                 addFragment(bdLocation.getCity());
                 isLocated = true;
@@ -116,9 +129,29 @@ public class MainActivity extends AppCompatActivity {
     private void addFragment(String cityName){
         Bundle bundle = new Bundle();
         bundle.putString("place",cityName);
+        Log.d("MainActivityaddFragment",cityName);
         FragmentWeather fragmentWeather = new FragmentWeather();
         fragmentWeather.setArguments(bundle);
+
         fragmentList.add(fragmentWeather);
         myFragmentPagerView.notifyDataSetChanged();
+        ImageView imageView = new ImageView(this);
+        if (linearLayout.getChildCount() == 0){
+            imageView.setImageResource(R.drawable.point_bright);
+        }else {
+            imageView.setImageResource(R.drawable.point_dark);
+        }
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(Utils.dp2px(this,10),Utils.dp2px(this,10));
+        imageView.setLayoutParams(param);
+//        linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.addView(imageView);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 3 && resultCode == 4){
+            addFragment(data.getStringExtra("cityName"));
+        }
     }
 }

@@ -44,6 +44,7 @@
                 android:src="@drawable/search"
                 android:layout_gravity="center"/>
             <EditText
+                android:id="@+id/ac_citychoose_et"
                 android:layout_width="wrap_content"
                 android:layout_height="26dp"
                 android:layout_marginStart="2dp"

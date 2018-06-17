@@ -1,5 +1,6 @@
 package com.whut.umrhamster.weatherforecast.View;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -22,6 +23,8 @@ import com.whut.umrhamster.weatherforecast.Model.District;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.R;
+
+import org.litepal.LitePal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +66,33 @@ public class FragmentDistrictChoose extends Fragment {
         adapter.setOnItemClickListener(new DistrictChooseAdapter.OnItemClickListener() { //条目点击事件处理
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(getActivity(),"你选择了 "+districtList.get(position),Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                intent.putExtra("cityName",districtList.get(position).getDistrictName());
+                getActivity().setResult(2,intent);
+                Toast.makeText(getActivity(),"你选择了 "+districtList.get(position).getDistrictName(),Toast.LENGTH_SHORT).show();
+                getActivity().finish();
             }
         });
         recyclerView.setAdapter(adapter);
     }
+//    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//        if(s.equals(null)){
+//            imageButtonDelete.setVisibility(View.GONE);
+//        }
+//    }
+//
+//    @Override
+//    public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//    }
+//
+//    @Override
+//    public void afterTextChanged(Editable s) {
+//        if(s.length()>0){
+//            imageButtonDelete.setVisibility(View.VISIBLE);  //删除图标可见
+//        }else{
+//            imageButtonDelete.setVisibility(View.GONE);  //删除图标不可见
+//        }
     private void initEvent(){
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -82,7 +107,9 @@ public class FragmentDistrictChoose extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-
+//                if (editable.length() > 0){
+//                    LitePal.where("provinceName like ?","%"+editable.toString()+"%").find(Province.class);
+//                }
             }
         });
     }
