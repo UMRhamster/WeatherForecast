@@ -7,25 +7,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.whut.umrhamster.weatherforecast.Model.City;
 import com.whut.umrhamster.weatherforecast.Model.District;
-import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.R;
-
-import org.litepal.crud.LitePalSupport;
 
 import java.util.List;
 
 /**
- * Created by 12421 on 2018/6/15.
+ * Created by 12421 on 2018/6/16.
  */
 
-public class CityChooseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
-    private List<City> cityList;
+public class DistrictChooseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
+    private List<District> districtList;
     private Context context;
-    private OnItemClickListener itemClickListener;
-    public CityChooseAdapter(List<City> cityList, Context context){
-        this.cityList = cityList;
+    private DistrictChooseAdapter.OnItemClickListener itemClickListener;
+    public DistrictChooseAdapter(List<District> districtList, Context context){
+        this.districtList = districtList;
         this.context = context;
     }
     @Override
@@ -39,29 +35,29 @@ public class CityChooseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 }
             }
         });
-        ViewHolder viewHolder = new ViewHolder(view);
+        DistrictChooseAdapter.ViewHolder viewHolder = new DistrictChooseAdapter.ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((ViewHolder)holder).cityName.setText(cityList.get(position).getCityName());
-        ((ViewHolder)holder).itemView.setTag(position);
+        ((DistrictChooseAdapter.ViewHolder)holder).districtName.setText(districtList.get(position).getDistrictName());
+        ((DistrictChooseAdapter.ViewHolder)holder).itemView.setTag(position);
     }
 
     @Override
     public int getItemCount() {
-        return cityList.size();
+        return districtList.size();
     }
     static class ViewHolder extends RecyclerView.ViewHolder{
-        TextView cityName;
+        TextView districtName;
         public ViewHolder(View itemView) {
             super(itemView);
-            cityName = itemView.findViewById(R.id.rv_item_tv);
+            districtName = itemView.findViewById(R.id.rv_item_tv);
         }
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+    public void setOnItemClickListener(DistrictChooseAdapter.OnItemClickListener onItemClickListener){
         this.itemClickListener = onItemClickListener;
     }
     //声明外部接口

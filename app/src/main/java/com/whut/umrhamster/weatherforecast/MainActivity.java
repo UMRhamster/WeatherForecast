@@ -103,9 +103,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             if (!isLocated){
-                textViewTitle.setText(bdLocation.getDistrict());    //获得地区名，例如：武昌区
+                textViewTitle.setText(bdLocation.getCity());    //获得地区名，例如：武昌区
                 //通过定位获得地区名，创建fragment
-                addFragment(bdLocation.getDistrict());
+                addFragment(bdLocation.getCity());
                 isLocated = true;
             }
         }

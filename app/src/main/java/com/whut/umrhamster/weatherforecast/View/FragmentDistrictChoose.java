@@ -1,6 +1,7 @@
 package com.whut.umrhamster.weatherforecast.View;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +16,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.whut.umrhamster.weatherforecast.Model.City;
+import com.whut.umrhamster.weatherforecast.Model.District;
+import com.whut.umrhamster.weatherforecast.Model.Province;
+import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.R;
 
 import java.util.ArrayList;
@@ -28,29 +33,33 @@ public class FragmentDistrictChoose extends Fragment {
     private EditText editTextSearch;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private CityChooseAdapter adapter;
-    private List<String> districtList;
+    private DistrictChooseAdapter adapter;
+    private List<District> districtList;
     private TextView textViewTitle;
+
+    private City city;
+    Handler handler = new Handler();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_district_choose,container,false);
         initView(view);
         initEvent();
+        initData();
         return view;
     }
     private void initView(View view){
         textViewTitle = view.findViewById(R.id.fg_district_choose_tv);
-        textViewTitle.setText(getArguments().getString("cityName"));  //设置标题与选择省份对应
+        city = (City)getArguments().getSerializable("city");
+        textViewTitle.setText(city.getCityName());  //设置标题与选择城市对应
         editTextSearch = view.findViewById(R.id.fg_district_search_et);
         recyclerView = view.findViewById(R.id.fg_district_choose_rv);
         linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         districtList = new ArrayList<>();
-        districtList.add("地区一");
-        districtList.add("地区二");
-        adapter = new CityChooseAdapter(districtList,getActivity());
-        adapter.setOnItemClickListener(new CityChooseAdapter.OnItemClickListener() { //条目点击事件处理
+//        districtList = Utils.queryDistrict();
+        adapter = new DistrictChooseAdapter(districtList,getActivity());
+        adapter.setOnItemClickListener(new DistrictChooseAdapter.OnItemClickListener() { //条目点击事件处理
             @Override
             public void onItemClick(View view, int position) {
                 Toast.makeText(getActivity(),"你选择了 "+districtList.get(position),Toast.LENGTH_SHORT).show();
@@ -75,5 +84,20 @@ public class FragmentDistrictChoose extends Fragment {
 
             }
         });
+    }
+    private void initData(){
+        new Thread(){
+            @Override
+            public void run() {
+                districtList.clear();
+                districtList.addAll(Utils.queryDistrict(((Province)getArguments().getSerializable("province")).getProvinceId(),city.getCityId()));
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }.start();
     }
 }

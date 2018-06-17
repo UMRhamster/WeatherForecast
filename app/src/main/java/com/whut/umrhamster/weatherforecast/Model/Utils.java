@@ -1,5 +1,7 @@
 package com.whut.umrhamster.weatherforecast.Model;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,23 +87,40 @@ public class Utils {
         List<Province> provinceList = null;
         provinceList = LitePal.findAll(Province.class);
         if (provinceList.size() > 0){
+            Log.d("Utils->Province","数据库目前有"+provinceList.size()+"条Province记录");
             return provinceList;
         }else {
-            queryFromServer("http://www.weather.com.cn/data/city3jdata/china.html","province",0);
+            queryFromServer("http://www.weather.com.cn/data/city3jdata/china.html","province","");
+            return LitePal.findAll(Province.class);
         }
-        return null;
+//        return null;
     }
     //查询市
-    public static List<City> queryCity(){
-        List<City> cityList = LitePal.findAll(City.class);
+    public static List<City> queryCity(String id){
+        List<City> cityList = null;
+        cityList = LitePal.where("provinceId = ?",id).find(City.class);
         if (cityList.size() > 0){
+            Log.d("Utils->City",String.valueOf(cityList.size()));
             return cityList;
         }else {
-            queryFromServer("http://www.weather.com.cn/data/city3jdata/provshi/"+10101+".html","city",10101);
+            queryFromServer("http://www.weather.com.cn/data/city3jdata/provshi/"+id+".html","city",id);
+            return LitePal.where("provinceId = ?",id).find(City.class);
         }
-        return null;
+//        return null;
     }
-    private static void queryFromServer(String address, String type, int id){
+    //查询地区
+    public static List<District> queryDistrict(String provinceId, String cityId){
+        List<District> districtList = LitePal.where("cityId = ?",cityId).find(District.class);
+        if (districtList.size() > 0){
+            Log.d("Utils->District",String.valueOf(districtList.size()));
+            return districtList;
+        }else {
+            queryFromServer("http://www.weather.com.cn/data/city3jdata/station/"+provinceId+cityId+".html","district",cityId);
+            return LitePal.where("cityId = ?",cityId).find(District.class);
+        }
+//        return null;
+    }
+    private static void queryFromServer(String address, String type, String id){
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(address).build();
         Response response = null;
@@ -128,7 +147,8 @@ public class Utils {
             while (iterator.hasNext()){
                 String id = (String) iterator.next();
                 Province province = new Province();
-                province.setId(Integer.valueOf(id));
+                province.setProvinceId(id);
+                Log.d("Utilsprovince",String.valueOf(province.getProvinceId()));
                 province.setProvinceName(jsonObject.getString(id));
                 province.save();
             }
@@ -138,14 +158,14 @@ public class Utils {
     }
 
     //http://www.weather.com.cn/data/city3jdata/provshi/10120.html
-    private static void handleJsonCity(String json, int provinceId){
+    private static void handleJsonCity(String json, String provinceId){
         try {
             JSONObject jsonObject = new JSONObject(json);
             Iterator iterator = jsonObject.keys();
             while (iterator.hasNext()){
                 String id = (String) iterator.next();
                 City city = new City();
-                city.setId(Integer.valueOf(id));
+                city.setCityId(id);
                 city.setCityName(jsonObject.getString(id));
                 city.setProvinceId(provinceId);
                 city.save();
@@ -155,14 +175,14 @@ public class Utils {
         }
     }
     //http://www.weather.com.cn/data/city3jdata/station/1012002.html
-    private static void handleJsonDistrict(String json, int cityId){
+    private static void handleJsonDistrict(String json, String cityId){
         try {
             JSONObject jsonObject = new JSONObject(json);
             Iterator iterator = jsonObject.keys();
             while (iterator.hasNext()){
                 String id = (String) iterator.next();
                 District district = new District();
-                district.setCityId(Integer.valueOf(id));
+                district.setDistrictId(id);
                 district.setDistrictName(jsonObject.getString(id));
                 district.setCityId(cityId);
                 district.save();

@@ -10,7 +10,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.R;
+
+import org.litepal.LitePal;
 
 public class CityChooseActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
@@ -21,6 +24,7 @@ public class CityChooseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_city_choose);
 
         coordinatorLayout = findViewById(R.id.ac_citychoose_cl);
+//        LitePal.deleteAll(Province.class);
         setDefaultFragment();  //设置默认fragment
     }
     private void setDefaultFragment(){
@@ -44,7 +48,7 @@ public class CityChooseActivity extends AppCompatActivity {
             }else if (getSupportFragmentManager().getFragments().get(0) instanceof  FragmentDistrictChoose){
                 Bundle bundle = new Bundle();
 //                Log.d("CityChooseActivity",getSupportFragmentManager().getFragments().get(0).getArguments().getString("provinceName"));
-                bundle.putString("provinceName",getSupportFragmentManager().getFragments().get(0).getArguments().getString("provinceName"));
+                bundle.putSerializable("province",(getSupportFragmentManager().getFragments().get(0).getArguments().getSerializable("province")));
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentCityChoose fragmentCityChoose = new FragmentCityChoose();
                 fragmentCityChoose.setArguments(bundle);
