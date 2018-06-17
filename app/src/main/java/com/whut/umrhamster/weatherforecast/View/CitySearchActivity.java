@@ -24,7 +24,15 @@ public class CitySearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(CitySearchActivity.this,CityChooseActivity.class));
+                overridePendingTransition(R.anim.anim_fg_enter,R.anim.anim_do_nothing);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        overridePendingTransition(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out);
     }
 }

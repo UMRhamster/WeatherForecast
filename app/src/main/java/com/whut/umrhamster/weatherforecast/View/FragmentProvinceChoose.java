@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -61,7 +64,7 @@ public class FragmentProvinceChoose extends Fragment {
                 Log.d("asdafdss",provinceList.get(position).getProvinceId());
 //                bundle.putString("provinceName",provinceList.get(position).getProvinceName());
                 fragmentCityChoose.setArguments(bundle);
-                fm.beginTransaction().replace(R.id.ac_citychoose_cl,fragmentCityChoose).commit();
+                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_enter,R.anim.anim_fg_out).replace(R.id.ac_citychoose_cl,fragmentCityChoose).commit();
             }
         });
         recyclerView.setAdapter(adapter);

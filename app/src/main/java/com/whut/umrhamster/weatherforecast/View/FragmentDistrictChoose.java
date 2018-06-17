@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,7 +91,8 @@ public class FragmentDistrictChoose extends Fragment {
             @Override
             public void run() {
                 districtList.clear();
-                districtList.addAll(Utils.queryDistrict(((Province)getArguments().getSerializable("province")).getProvinceId(),city.getCityId()));
+//                Log.d("FragmentDistrictChoose",city.getProvinceId()+"  "+city.getCityId());
+                districtList.addAll(Utils.queryDistrict(city.getCityId()));
                 handler.post(new Runnable() {
                     @Override
                     public void run() {

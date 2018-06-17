@@ -46,6 +46,9 @@ public class CityChooseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ((ViewHolder)holder).cityName.setText(cityList.get(position).getCityName());
+        if (position == getItemCount()){
+            ((ViewHolder)holder).divider.setVisibility(View.GONE);
+        }
         ((ViewHolder)holder).itemView.setTag(position);
     }
 
@@ -55,9 +58,11 @@ public class CityChooseAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
     static class ViewHolder extends RecyclerView.ViewHolder{
         TextView cityName;
+        View divider;
         public ViewHolder(View itemView) {
             super(itemView);
             cityName = itemView.findViewById(R.id.rv_item_tv);
+            divider = itemView.findViewById(R.id.rv_item_v);
         }
     }
 

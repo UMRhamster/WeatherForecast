@@ -109,13 +109,13 @@ public class Utils {
 //        return null;
     }
     //查询地区
-    public static List<District> queryDistrict(String provinceId, String cityId){
+    public static List<District> queryDistrict(String cityId){
         List<District> districtList = LitePal.where("cityId = ?",cityId).find(District.class);
         if (districtList.size() > 0){
             Log.d("Utils->District",String.valueOf(districtList.size()));
             return districtList;
         }else {
-            queryFromServer("http://www.weather.com.cn/data/city3jdata/station/"+provinceId+cityId+".html","district",cityId);
+            queryFromServer("http://www.weather.com.cn/data/city3jdata/station/"+cityId+".html","district",cityId);
             return LitePal.where("cityId = ?",cityId).find(District.class);
         }
 //        return null;
@@ -165,7 +165,7 @@ public class Utils {
             while (iterator.hasNext()){
                 String id = (String) iterator.next();
                 City city = new City();
-                city.setCityId(id);
+                city.setCityId(provinceId+id);  //直接使用cityId会导致id重复
                 city.setCityName(jsonObject.getString(id));
                 city.setProvinceId(provinceId);
                 city.save();

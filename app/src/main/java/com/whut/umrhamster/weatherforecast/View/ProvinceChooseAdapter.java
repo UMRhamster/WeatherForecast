@@ -42,6 +42,9 @@ public class ProvinceChooseAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         ((ProvinceChooseAdapter.ViewHolder)holder).provinceName.setText(provinceList.get(position).getProvinceName());
+        if (position == getItemCount()){
+            ((ViewHolder)holder).divider.setVisibility(View.GONE);
+        }
         ((ProvinceChooseAdapter.ViewHolder)holder).itemView.setTag(position);
     }
 
@@ -51,9 +54,11 @@ public class ProvinceChooseAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
     static class ViewHolder extends RecyclerView.ViewHolder{
         TextView provinceName;
+        View divider;
         public ViewHolder(View itemView) {
             super(itemView);
             provinceName = itemView.findViewById(R.id.rv_item_tv);
+            divider = itemView.findViewById(R.id.rv_item_v);
         }
     }
 

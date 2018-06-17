@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.WindowManager;
 
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.R;
@@ -22,6 +23,8 @@ public class CityChooseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_city_choose);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        getWindow().setStatusBarColor(getResources().getColor(R.color.citySearchtb));
 
         coordinatorLayout = findViewById(R.id.ac_citychoose_cl);
 //        LitePal.deleteAll(Province.class);
@@ -40,11 +43,12 @@ public class CityChooseActivity extends AppCompatActivity {
         if (keyCode == KeyEvent.KEYCODE_BACK){
             if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentCityChoose){  //从city选择界面返回，则显示省份
                 FragmentManager fm = getSupportFragmentManager();
-                fm.beginTransaction().replace(R.id.ac_citychoose_cl,new FragmentProvinceChoose()).commit();
+                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,new FragmentProvinceChoose()).commit();
                 return true;
             }else if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentProvinceChoose){
 //                Log.d("CityChooseActivity","province");
-                return super.onKeyDown(keyCode, event);
+                finish();
+                overridePendingTransition(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out);
             }else if (getSupportFragmentManager().getFragments().get(0) instanceof  FragmentDistrictChoose){
                 Bundle bundle = new Bundle();
 //                Log.d("CityChooseActivity",getSupportFragmentManager().getFragments().get(0).getArguments().getString("provinceName"));
@@ -52,7 +56,7 @@ public class CityChooseActivity extends AppCompatActivity {
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentCityChoose fragmentCityChoose = new FragmentCityChoose();
                 fragmentCityChoose.setArguments(bundle);
-                fm.beginTransaction().replace(R.id.ac_citychoose_cl,fragmentCityChoose).commit();
+                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,fragmentCityChoose).commit();
                 return true;
             }
         }

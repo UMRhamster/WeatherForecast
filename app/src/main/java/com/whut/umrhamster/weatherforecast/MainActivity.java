@@ -15,6 +15,7 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.whut.umrhamster.weatherforecast.Model.District;
 import com.whut.umrhamster.weatherforecast.View.CitySearchActivity;
 import com.whut.umrhamster.weatherforecast.View.FragmentWeather;
 import com.whut.umrhamster.weatherforecast.View.MyFragmentPagerView;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LitePal.initialize(this);   //初始化litepal
-
 
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
@@ -73,12 +73,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, CitySearchActivity.class));
+                overridePendingTransition(R.anim.anim_fg_enter,R.anim.anim_do_nothing);
             }
         });
         textViewTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this,CitySearchActivity.class));
+                overridePendingTransition(R.anim.anim_fg_enter,R.anim.anim_do_nothing);
             }
         });
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

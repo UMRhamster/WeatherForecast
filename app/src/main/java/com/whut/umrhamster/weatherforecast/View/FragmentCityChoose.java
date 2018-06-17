@@ -67,7 +67,7 @@ public class FragmentCityChoose extends Fragment {
                 bundle.putSerializable("city",cityList.get(position));
                 bundle.putSerializable("province",province);
                 fragmentDistrictChoose.setArguments(bundle);
-                fm.beginTransaction().replace(R.id.ac_citychoose_cl,fragmentDistrictChoose).commit();
+                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_enter,R.anim.anim_fg_out).replace(R.id.ac_citychoose_cl,fragmentDistrictChoose).commit();
             }
         });
         recyclerView.setAdapter(adapter);
@@ -96,7 +96,7 @@ public class FragmentCityChoose extends Fragment {
             @Override
             public void run() {
                 cityList.clear();
-//                Log.d("FragmentCityChoose",province.getProvinceId());
+                Log.d("FragmentCityChoose111",province.getProvinceId());
                 cityList.addAll(Utils.queryCity(province.getProvinceId()));
                 handler.post(new Runnable() {
                     @Override
