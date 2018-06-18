@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Fragment> fragmentList;   //用于存储显示天气预报的fragment
     private boolean isLocated = false;             //是否第一次定位
     private LinearLayout linearLayout;
+    private List<String> cityNameList;  //用于保存城市名，防止viewpager快速滑动崩溃问题
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.main_vp);
         linearLayout = findViewById(R.id.main_tb_ll);
         fragmentList = new ArrayList<>();
+        cityNameList = new ArrayList<>();
         myFragmentPagerView = new MyFragmentPagerView(getSupportFragmentManager(),fragmentList);
         viewPager.setAdapter(myFragmentPagerView);
     }
@@ -98,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.d("MainActivity","onPageSelected");
-                textViewTitle.setText(((FragmentWeather)fragmentList.get(position)).getWeather().getCity());
+//                Log.d("MainActivity","onPageSelected");
+                textViewTitle.setText(cityNameList.get(position));
                 ((ImageView)linearLayout.getChildAt(position)).setImageResource(R.drawable.point_bright);
                 for (int i=0;i<linearLayout.getChildCount();i++){
                     if (i !=position )
@@ -120,13 +122,14 @@ public class MainActivity extends AppCompatActivity {
             if (!isLocated){
                 textViewTitle.setText(Utils.correctCityName(bdLocation.getCity()));    //获得地区名，例如：武昌区
                 //通过定位获得地区名，创建fragment
-                addFragment(bdLocation.getCity());
+                addFragment(Utils.correctCityName(bdLocation.getCity()));
                 isLocated = true;
             }
         }
     }
 
     private void addFragment(String cityName){
+        cityNameList.add(cityName);
         Bundle bundle = new Bundle();
         bundle.putString("place",cityName);
         Log.d("MainActivityaddFragment",cityName);

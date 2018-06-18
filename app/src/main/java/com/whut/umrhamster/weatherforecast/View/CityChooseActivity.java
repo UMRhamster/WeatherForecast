@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 
+import com.whut.umrhamster.weatherforecast.Model.City;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.R;
 
@@ -18,7 +19,9 @@ import org.litepal.LitePal;
 
 public class CityChooseActivity extends AppCompatActivity {
     private CoordinatorLayout coordinatorLayout;
-    private Fragment fragmentProvinceChoose;
+    private Fragment fragmentDefault;
+
+//    private int enterPosition; //用于判断是从什么位置进入CityChooseActivity   0-从CitySearchActivity进入，1-从FragmentProvince，2-从FragmentCity,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,14 +30,13 @@ public class CityChooseActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(getResources().getColor(R.color.citySearchtb));
 
         coordinatorLayout = findViewById(R.id.ac_citychoose_cl);
-//        LitePal.deleteAll(Province.class);
         setDefaultFragment();  //设置默认fragment
     }
     private void setDefaultFragment(){
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        fragmentProvinceChoose = new FragmentProvinceChoose();
-        ft.replace(R.id.ac_citychoose_cl,fragmentProvinceChoose);
+        fragmentDefault = new FragmentProvinceChoose();
+        ft.replace(R.id.ac_citychoose_cl,fragmentDefault);
         ft.commit();
     }
 

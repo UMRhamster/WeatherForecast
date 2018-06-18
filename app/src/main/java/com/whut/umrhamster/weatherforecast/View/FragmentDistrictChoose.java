@@ -36,13 +36,16 @@ import java.util.List;
 public class FragmentDistrictChoose extends Fragment {
     private EditText editTextSearch;
     private RecyclerView recyclerView;
-    private LinearLayoutManager linearLayoutManager;
     private DistrictChooseAdapter adapter;
     private List<District> districtList;
     private TextView textViewTitle;
 
     private City city;
     Handler handler = new Handler();
+    //一下用于搜索
+    private RecyclerView recyclerViewForSearch;
+    private List<Object> objectList;
+    private CitySearchAdapter adapterForSearch;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,11 +61,35 @@ public class FragmentDistrictChoose extends Fragment {
         textViewTitle.setText(city.getCityName());  //设置标题与选择城市对应
         editTextSearch = view.findViewById(R.id.fg_district_search_et);
         recyclerView = view.findViewById(R.id.fg_district_choose_rv);
-        linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerViewForSearch = view.findViewById(R.id.fg_district_choose_rv_search);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
+        LinearLayoutManager linearLayoutManagerForSearch = new LinearLayoutManager(getActivity());
+        recyclerViewForSearch.setLayoutManager(linearLayoutManagerForSearch);
         districtList = new ArrayList<>();
+        objectList = new ArrayList<>();
 //        districtList = Utils.queryDistrict();
         adapter = new DistrictChooseAdapter(districtList,getActivity());
+        adapterForSearch = new CitySearchAdapter(objectList,getActivity());
+        adapterForSearch.setOnItemClickListener(new CitySearchAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                //对搜索的内容进行点击事件处理
+                if (objectList.get(position) instanceof Province){
+                    String provinceId = ((Province) objectList.get(position)).getProvinceId();
+                    searchData("city",provinceId);
+                }else if (objectList.get(position) instanceof City){
+                    String cityId  = ((City) objectList.get(position)).getCityId();
+                    searchData("district",cityId);
+                }else if (objectList.get(position) instanceof District){
+                    Intent intent = new Intent();
+                    intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
+                    getActivity().setResult(2,intent);
+//                    Toast.makeText(getActivity(),"你选择了 "+districtList.get(position).getDistrictName(),Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
+                }
+            }
+        });
         adapter.setOnItemClickListener(new DistrictChooseAdapter.OnItemClickListener() { //条目点击事件处理
             @Override
             public void onItemClick(View view, int position) {
@@ -74,25 +101,9 @@ public class FragmentDistrictChoose extends Fragment {
             }
         });
         recyclerView.setAdapter(adapter);
+        recyclerViewForSearch.setAdapter(adapterForSearch);
     }
-//    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//        if(s.equals(null)){
-//            imageButtonDelete.setVisibility(View.GONE);
-//        }
-//    }
-//
-//    @Override
-//    public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//    }
-//
-//    @Override
-//    public void afterTextChanged(Editable s) {
-//        if(s.length()>0){
-//            imageButtonDelete.setVisibility(View.VISIBLE);  //删除图标可见
-//        }else{
-//            imageButtonDelete.setVisibility(View.GONE);  //删除图标不可见
-//        }
+
     private void initEvent(){
         editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -107,9 +118,28 @@ public class FragmentDistrictChoose extends Fragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-//                if (editable.length() > 0){
-//                    LitePal.where("provinceName like ?","%"+editable.toString()+"%").find(Province.class);
-//                }
+                Log.d("FragmentProvinceChoose","afterTextChanged");
+                objectList.clear();
+                if (editable.length() > 0){
+                    recyclerView.setVisibility(View.GONE);
+                    recyclerViewForSearch.setVisibility(View.VISIBLE);
+                    List<Province> provinceList = LitePal.where("provinceName like ?","%"+editable.toString()+"%").find(Province.class);
+                    if (provinceList != null){
+                        objectList.addAll(provinceList);
+                    }
+                    List<City> cityList = LitePal.where("cityName like ?","%"+editable.toString()+"%").find(City.class);
+                    if (cityList != null){
+                        objectList.addAll(cityList);
+                    }
+                    List<District> districtList = LitePal.where("districtName like ?","%"+editable.toString()+"%").find(District.class);
+                    if (cityList != null){
+                        objectList.addAll(districtList);
+                    }
+                }else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    recyclerViewForSearch.setVisibility(View.GONE);
+                }
+                adapterForSearch.notifyDataSetChanged();
             }
         });
     }
@@ -124,6 +154,25 @@ public class FragmentDistrictChoose extends Fragment {
                     @Override
                     public void run() {
                         adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }.start();
+    }
+    private void searchData(final String string, final String id){
+        new Thread(){
+            @Override
+            public void run() {
+                objectList.clear();
+                if ("city".equals(string)){
+                    objectList.addAll(Utils.queryCity(id));
+                }else if ("district".equals(string)){
+                    objectList.addAll(Utils.queryDistrict(id));
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapterForSearch.notifyDataSetChanged();
                     }
                 });
             }

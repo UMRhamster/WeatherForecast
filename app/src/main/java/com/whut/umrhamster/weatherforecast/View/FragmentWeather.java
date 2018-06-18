@@ -104,5 +104,50 @@ public class FragmentWeather extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        if (weather != null ){
+            Log.d("Fragmenttest","onAttach"+weather.getCity());
+        }else {
+            Log.d("Fragmenttest","onAttach");
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (weather != null ){
+            Log.d("Fragmenttest","onCreate"+weather.getCity());
+        }else {
+            Log.d("Fragmenttest","onCreate");
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (weather != null ){
+            Log.d("Fragmenttest","onActivityCreate"+weather.getCity());
+        }else {
+            Log.d("Fragmenttest","onActivityCreate");
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (weather != null ){
+            Log.d("Fragmenttest","onStart"+weather.getCity());
+        }else {
+            Log.d("Fragmenttest","onStart");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (weather != null ){
+            Log.d("Fragmenttest","onResume"+weather.getCity());
+        }else {
+            Log.d("Fragmenttest","onResume");
+        }
     }
 }
