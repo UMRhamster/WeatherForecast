@@ -79,6 +79,27 @@ public class Utils {
         return weekDays[week-1];
     }
 
+    public static String getWeekByString(String str){
+        switch (str.substring(str.length()-1,str.length())){
+            case "一":
+                return "周一";
+            case "二":
+                return "周二";
+            case "三":
+                return "周三";
+            case "四":
+                return "周四";
+            case "五":
+                return "周五";
+            case "六":
+                return "周六";
+            case "天":
+                return "周日";
+            default:
+                return "周日";
+        }
+    }
+
     public static String getfl(String fl){
         return fl.substring(9,fl.length()-3);
     }

@@ -1,11 +1,15 @@
 package com.whut.umrhamster.weatherforecast.Model;
 
+import org.litepal.crud.LitePalSupport;
+
+import java.io.Serializable;
+
 /**
  * Created by 12421 on 2018/6/13.
  */
 
-public class DailyWeather {
-    private String date;  //日期
+public class DailyWeather extends LitePalSupport implements Serializable{
+    private String date;  //日期, 13号星期五
     private String high;  //最高温度
     private String low;   //最低温度
     private String fx;    //风向

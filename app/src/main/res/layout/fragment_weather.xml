@@ -10,14 +10,17 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:layout_marginTop="?attr/actionBarSize">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="200dp"
-            android:layout_marginStart="10dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
             <RelativeLayout
+                android:layout_marginTop="200dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -47,26 +50,159 @@
                     android:textColor="@android:color/white"
                     android:layout_toEndOf="@id/weather_fg_temperature"
                     android:layout_alignBaseline="@id/weather_fg_temperature"/>
+                <TextView
+                    android:id="@+id/weather_fg_wctemperature"
+                    android:layout_below="@id/weather_fg_temperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/WCTemperature"
+                    android:textColor="@android:color/white"/>
+                <TextView
+                    android:id="@+id/weather_fg_windcondition"
+                    android:layout_below="@id/weather_fg_wctemperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="南风4级"
+                    android:textColor="@android:color/white"/>
+                <TextView
+                    android:id="@+id/weather_fg_lunardate"
+                    android:layout_below="@id/weather_fg_windcondition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lunardate"
+                    android:textColor="@android:color/white"/>
             </RelativeLayout>
-            <TextView
-                android:id="@+id/weather_fg_wctemperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/WCTemperature"
-                android:textColor="@android:color/white"/>
-            <TextView
-                android:id="@+id/weather_fg_windcondition"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="南风4级"
-                android:textColor="@android:color/white"/>
-            <TextView
-                android:id="@+id/weather_fg_lunardate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lunardate"
-                android:textColor="@android:color/white"/>
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="26dp"
+                android:layout_marginEnd="26dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@android:color/darker_gray"
+                        android:text="昨天"/>
+                    <ImageView
+                        android:id="@+id/fg_weather_yesterday_iv"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/qingtian"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@android:color/white"
+                        android:text="今天"/>
+                    <ImageView
+                        android:id="@+id/fg_weather_today_iv"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/qingtian"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/fg_weather_third_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@android:color/white"
+                        android:text="第三"/>
+                    <ImageView
+                        android:id="@+id/fg_weather_third_iv"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/qingtian"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/fg_weather_forth_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@android:color/white"
+                        android:text="第四"/>
+                    <ImageView
+                        android:id="@+id/fg_weather_forth_iv"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/qingtian"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/fg_weather_fifth_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@android:color/white"
+                        android:text="第五"/>
+                    <ImageView
+                        android:id="@+id/fg_weather_fifth_iv"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/qingtian"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/fg_weather_sixth_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:textColor="@android:color/white"
+                        android:text="第六"/>
+                    <ImageView
+                        android:id="@+id/fg_weather_sixth_iv"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/qingtian"/>
+                </LinearLayout>
+
+            </LinearLayout>
+            <com.github.mikephil.charting.charts.LineChart
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:id="@+id/fg_weather_lc"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+            </com.github.mikephil.charting.charts.LineChart>
         </LinearLayout>
+
 
     </android.support.v4.widget.NestedScrollView>
 

@@ -10,13 +10,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.whut.umrhamster.weatherforecast.MainActivity;
+import com.whut.umrhamster.weatherforecast.Model.ChartUtils;
 import com.whut.umrhamster.weatherforecast.Model.DailyWeather;
 import com.whut.umrhamster.weatherforecast.Model.Lunar;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.Model.Weather;
+import com.whut.umrhamster.weatherforecast.Model.WeatherUtils;
 import com.whut.umrhamster.weatherforecast.R;
 
 import java.io.IOException;
@@ -39,14 +43,25 @@ public class FragmentWeather extends Fragment {
     private TextView textViewLunarDate;      //农历日期
     private TextView textViewSituation;      //天气情况
 
+    private TextView textViewThird;
+    private TextView textViewForth;
+    private TextView textViewFifth;
+    private TextView textViewSixth;
+    private ImageView imageViewYesterday;
+    private ImageView imageViewToday;
+    private ImageView imageViewThird;
+    private ImageView imageViewForth;
+    private ImageView imageViewFifth;
+    private ImageView imageViewSixth;
 
-    Handler handler = new Handler();
+    private LineChart lineChart; //6天天气预报折线图
+//    Handler handler = new Handler();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_weather,container,false);
         initView(view);    //初始化控件
-        initData();  //开启线程进行网络请求
+        initData();  //开启线程进行网络请求,更新后不需要开启线程
         return view;
     }
 
@@ -56,98 +71,91 @@ public class FragmentWeather extends Fragment {
         textViewWindCondition = view.findViewById(R.id.weather_fg_windcondition);
         textViewLunarDate = view.findViewById(R.id.weather_fg_lunardate);
         textViewSituation = view.findViewById(R.id.weather_fg_situation);
+        //
+        textViewThird = view.findViewById(R.id.fg_weather_third_tv);
+        textViewForth = view.findViewById(R.id.fg_weather_forth_tv);
+        textViewFifth = view.findViewById(R.id.fg_weather_fifth_tv);
+        textViewSixth = view.findViewById(R.id.fg_weather_sixth_tv);
+        imageViewYesterday = view.findViewById(R.id.fg_weather_yesterday_iv);
+        imageViewToday = view.findViewById(R.id.fg_weather_today_iv);
+        imageViewThird = view.findViewById(R.id.fg_weather_third_iv);
+        imageViewForth = view.findViewById(R.id.fg_weather_forth_iv);
+        imageViewFifth = view.findViewById(R.id.fg_weather_fifth_iv);
+        imageViewSixth = view.findViewById(R.id.fg_weather_sixth_iv);
+        //
+        lineChart = view.findViewById(R.id.fg_weather_lc);
     }
     private void initData(){
-        new Thread(){
-            @Override
-            public void run() {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("http://wthrcdn.etouch.cn/weather_mini?city=").append(getArguments().getString("place"));
-                OkHttpClient okHttpClient = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url(stringBuilder.toString())
-                        .build();
-                Response response = null;
-                try {
-                    response = okHttpClient.newCall(request).execute();
-                    String json = response.body().string();
-                    weather = Utils.Json2Weather(json);
-                    Log.d("FragmentWeatherinitData",weather.getCity());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            //此处更新ui
-                            DailyWeather today = weather.getForecast().get(0);
-                            textViewTemperature.setText(weather.getWendu());
-                            textViewWCTemperature.setText(String.format(getResources().getString(R.string.WCTemperature),weather.getWendu()));
-                            textViewWindCondition.setText(String.format(getResources().getString(R.string.windCondition),today.getFx(),Utils.getfl(today.getFl())));
-                            Calendar calendar = Calendar.getInstance();
-                            Lunar lunar = new Lunar(calendar);
-                            String month = Utils.numberChange(calendar.get(Calendar.MONTH)+1);
-                            String day = Utils.numberChange(calendar.get(Calendar.DAY_OF_MONTH));
-                            String week = Utils.getWeek(calendar.get(Calendar.DAY_OF_WEEK));
-                            textViewLunarDate.setText(String.format(getResources().getString(R.string.lunardate),month,day,week,lunar.getMonthAndDay()));
-                            textViewSituation.setText(today.getType());
-                        }
-                    });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
+        weather = (Weather) getArguments().getSerializable("weather");
+        DailyWeather today = weather.getForecast().get(0);
+        textViewTemperature.setText(weather.getWendu());
+        textViewWCTemperature.setText(String.format(getResources().getString(R.string.WCTemperature),weather.getWendu()));
+        textViewWindCondition.setText(String.format(getResources().getString(R.string.windCondition),today.getFx(),Utils.getfl(today.getFl())));
+        Calendar calendar = Calendar.getInstance();
+        Lunar lunar = new Lunar(calendar);
+        String month = Utils.numberChange(calendar.get(Calendar.MONTH)+1);
+        String day = Utils.numberChange(calendar.get(Calendar.DAY_OF_MONTH));
+        String week = Utils.getWeek(calendar.get(Calendar.DAY_OF_WEEK));
+        textViewLunarDate.setText(String.format(getResources().getString(R.string.lunardate),month,day,week,lunar.getMonthAndDay()));
+        textViewSituation.setText(today.getType());
+        ChartUtils.initChart(lineChart,weather);
+        ChartUtils.setChartData(getActivity().getApplicationContext(),lineChart,weather);
+
+        textViewThird.setText(Utils.getWeekByString(weather.getForecast().get(1).getDate()));
+        textViewForth.setText(Utils.getWeekByString(weather.getForecast().get(2).getDate()));
+        textViewFifth.setText(Utils.getWeekByString(weather.getForecast().get(3).getDate()));
+        textViewSixth.setText(Utils.getWeekByString(weather.getForecast().get(4).getDate()));
+        imageViewYesterday.setImageResource(WeatherUtils.getImgbyType(weather.getYesterday().getType()));
+        imageViewToday.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(0).getType()));
+        imageViewThird.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(1).getType()));
+        imageViewForth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(2).getType()));
+        imageViewFifth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(3).getType()));
+        imageViewSixth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(4).getType()));
+
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                StringBuilder stringBuilder = new StringBuilder();
+//                stringBuilder.append("http://wthrcdn.etouch.cn/weather_mini?city=").append(getArguments().getString("place"));
+//                OkHttpClient okHttpClient = new OkHttpClient();
+//                Request request = new Request.Builder()
+//                        .url(stringBuilder.toString())
+//                        .build();
+//                Response response = null;
+//                try {
+//                    response = okHttpClient.newCall(request).execute();
+//                    String json = response.body().string();
+//                    weather = Utils.Json2Weather(json);
+////                    Log.d("FragmentWeatherinitData",weather.getCity());
+//                    handler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            //此处更新ui
+//                            DailyWeather today = weather.getForecast().get(0);
+//                            textViewTemperature.setText(weather.getWendu());
+//                            textViewWCTemperature.setText(String.format(getResources().getString(R.string.WCTemperature),weather.getWendu()));
+//                            textViewWindCondition.setText(String.format(getResources().getString(R.string.windCondition),today.getFx(),Utils.getfl(today.getFl())));
+//                            Calendar calendar = Calendar.getInstance();
+//                            Lunar lunar = new Lunar(calendar);
+//                            String month = Utils.numberChange(calendar.get(Calendar.MONTH)+1);
+//                            String day = Utils.numberChange(calendar.get(Calendar.DAY_OF_MONTH));
+//                            String week = Utils.getWeek(calendar.get(Calendar.DAY_OF_WEEK));
+//                            textViewLunarDate.setText(String.format(getResources().getString(R.string.lunardate),month,day,week,lunar.getMonthAndDay()));
+//                            textViewSituation.setText(today.getType());
+//
+//                            //得到weather以后再绘制图表
+//                            ChartUtils.initChart(lineChart,weather);
+//                        }
+//                    });
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }.start();
     }
 
     public Weather getWeather() {
         return weather;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (weather != null ){
-            Log.d("Fragmenttest","onAttach"+weather.getCity());
-        }else {
-            Log.d("Fragmenttest","onAttach");
-        }
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (weather != null ){
-            Log.d("Fragmenttest","onCreate"+weather.getCity());
-        }else {
-            Log.d("Fragmenttest","onCreate");
-        }
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (weather != null ){
-            Log.d("Fragmenttest","onActivityCreate"+weather.getCity());
-        }else {
-            Log.d("Fragmenttest","onActivityCreate");
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (weather != null ){
-            Log.d("Fragmenttest","onStart"+weather.getCity());
-        }else {
-            Log.d("Fragmenttest","onStart");
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (weather != null ){
-            Log.d("Fragmenttest","onResume"+weather.getCity());
-        }else {
-            Log.d("Fragmenttest","onResume");
-        }
-    }
 }
