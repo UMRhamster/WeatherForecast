@@ -15,6 +15,7 @@ import android.widget.EditText;
 
 import com.whut.umrhamster.weatherforecast.Model.City;
 import com.whut.umrhamster.weatherforecast.Model.District;
+import com.whut.umrhamster.weatherforecast.Model.NetWorkUtils;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.R;
@@ -56,7 +57,7 @@ public class CitySearchActivity extends AppCompatActivity {
         adapter = new CitySearchAdapter(objectList,this);
         adapter.setOnItemClickListener(new CitySearchAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void onItemClick(View view, final int position) {
                 //对搜索的内容进行点击事件处理
                 if (objectList.get(position) instanceof Province){
                     String provinceId = ((Province) objectList.get(position)).getProvinceId();
@@ -65,11 +66,41 @@ public class CitySearchActivity extends AppCompatActivity {
                     String cityId  = ((City) objectList.get(position)).getCityId();
                     searchData("district",cityId);
                 }else if (objectList.get(position) instanceof District){
-                    Intent intent = new Intent();
-                    intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
-                    setResult(4,intent);
-//                    Toast.makeText(getActivity(),"你选择了 "+districtList.get(position).getDistrictName(),Toast.LENGTH_SHORT).show();
-                    finish();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //先检查网络是否可用
+                            if (!NetWorkUtils.checkNetState(getApplicationContext())){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TipDialog tipDialog = new TipDialog(getApplicationContext(),0);
+                                        tipDialog.show();
+                                    }
+                                });
+                                return;
+                            }
+                            //再检查是否有该城市的天气预报
+                            if (Utils.hasWeather(((District) objectList.get(position)).getDistrictName())){
+                                Intent intent = new Intent();
+                                intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
+                                setResult(4,intent);
+                                finish();
+                            }else {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TipDialog tipDialog = new TipDialog(getApplicationContext(),1);
+                                        tipDialog.show();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
+//                    Intent intent = new Intent();
+//                    intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
+//                    setResult(4,intent);
+//                    finish();
                 }
             }
         });

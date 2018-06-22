@@ -18,9 +18,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.whut.umrhamster.weatherforecast.Model.City;
 import com.whut.umrhamster.weatherforecast.Model.District;
+import com.whut.umrhamster.weatherforecast.Model.NetWorkUtils;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.R;
@@ -35,6 +37,7 @@ import java.util.List;
  */
 
 public class FragmentProvinceChoose extends Fragment {
+    private ImageView imageViewBack;
     private EditText editTextSearch;
     private RecyclerView recyclerView;
     private ProvinceChooseAdapter adapter;
@@ -55,6 +58,7 @@ public class FragmentProvinceChoose extends Fragment {
         return view;
     }
     private void initView(View view){
+        imageViewBack = view.findViewById(R.id.fg_province_choose_back_iv);
         editTextSearch = view.findViewById(R.id.fg_province_search_et);
         recyclerView = view.findViewById(R.id.fg_province_choose_rv);
         recyclerViewForSearch = view.findViewById(R.id.fg_province_choose_rv_search);
@@ -69,7 +73,7 @@ public class FragmentProvinceChoose extends Fragment {
         adapterForSearch = new CitySearchAdapter(objectList,getActivity());
         adapterForSearch.setOnItemClickListener(new CitySearchAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void onItemClick(View view, final int position) {
                 //对搜索的内容进行点击事件处理
                 if (objectList.get(position) instanceof Province){
                     String provinceId = ((Province) objectList.get(position)).getProvinceId();
@@ -78,11 +82,37 @@ public class FragmentProvinceChoose extends Fragment {
                     String cityId  = ((City) objectList.get(position)).getCityId();
                     searchData("district",cityId);
                 }else if (objectList.get(position) instanceof District){
-                    Intent intent = new Intent();
-                    intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
-                    getActivity().setResult(2,intent);
-//                    Toast.makeText(getActivity(),"你选择了 "+districtList.get(position).getDistrictName(),Toast.LENGTH_SHORT).show();
-                    getActivity().finish();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //先检查网络是否可用
+                            if (!NetWorkUtils.checkNetState(getActivity())){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TipDialog tipDialog = new TipDialog(getActivity(),0);
+                                        tipDialog.show();
+                                    }
+                                });
+                                return;
+                            }
+                            //再检查是否有该城市的天气预报
+                            if (Utils.hasWeather(((District) objectList.get(position)).getDistrictName())){
+                                Intent intent = new Intent();
+                                intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
+                                getActivity().setResult(2,intent);
+                                getActivity().finish();
+                            }else {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TipDialog tipDialog = new TipDialog(getActivity(),1);
+                                        tipDialog.show();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
                 }
             }
         });
@@ -138,6 +168,12 @@ public class FragmentProvinceChoose extends Fragment {
                     recyclerViewForSearch.setVisibility(View.GONE);
                 }
                 adapterForSearch.notifyDataSetChanged();
+            }
+        });
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed(); //交给activity处理，返回上一级
             }
         });
     }

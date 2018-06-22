@@ -3,4 +3,9 @@
     <string name="WCTemperature">体感温度%1$s°</string>
     <string name="windCondition">%1$s%2$s</string>
     <string name="lunardate">%1$s/%2$s%3$s 农历%4$s</string>
+    <string name="tip">天气提示</string>
+    <string name="tipContentNet">抱歉！连接网络失败，请您查看您的网络设置，WLAN用户请检查您手否获得了访问权限。</string>
+    <string name="tipContentWeather">抱歉！暂无您所选择地区的天气预报，建议选择市级城市查看天气预报。</string>
+    <string name="tipContentUnknow">抱歉！发生了未知错误。</string>
+    <string name="queding">确定</string>
 </resources>

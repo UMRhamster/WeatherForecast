@@ -15,11 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.whut.umrhamster.weatherforecast.Model.City;
 import com.whut.umrhamster.weatherforecast.Model.District;
+import com.whut.umrhamster.weatherforecast.Model.NetWorkUtils;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.R;
@@ -39,6 +41,7 @@ public class FragmentDistrictChoose extends Fragment {
     private DistrictChooseAdapter adapter;
     private List<District> districtList;
     private TextView textViewTitle;
+    private ImageView imageViewBack;
 
     private City city;
     Handler handler = new Handler();
@@ -56,6 +59,7 @@ public class FragmentDistrictChoose extends Fragment {
         return view;
     }
     private void initView(View view){
+        imageViewBack = view.findViewById(R.id.fg_district_back_iv);
         textViewTitle = view.findViewById(R.id.fg_district_choose_tv);
         city = (City)getArguments().getSerializable("city");
         textViewTitle.setText(city.getCityName());  //设置标题与选择城市对应
@@ -73,7 +77,7 @@ public class FragmentDistrictChoose extends Fragment {
         adapterForSearch = new CitySearchAdapter(objectList,getActivity());
         adapterForSearch.setOnItemClickListener(new CitySearchAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void onItemClick(View view, final int position) {
                 //对搜索的内容进行点击事件处理
                 if (objectList.get(position) instanceof Province){
                     String provinceId = ((Province) objectList.get(position)).getProvinceId();
@@ -82,22 +86,82 @@ public class FragmentDistrictChoose extends Fragment {
                     String cityId  = ((City) objectList.get(position)).getCityId();
                     searchData("district",cityId);
                 }else if (objectList.get(position) instanceof District){
-                    Intent intent = new Intent();
-                    intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
-                    getActivity().setResult(2,intent);
-//                    Toast.makeText(getActivity(),"你选择了 "+districtList.get(position).getDistrictName(),Toast.LENGTH_SHORT).show();
-                    getActivity().finish();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //先检查网络是否可用
+                            if (!NetWorkUtils.checkNetState(getActivity())){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TipDialog tipDialog = new TipDialog(getActivity(),0);
+                                        tipDialog.show();
+                                    }
+                                });
+                                return;
+                            }
+                            //再检查是否有该城市的天气预报
+                            if (Utils.hasWeather(((District) objectList.get(position)).getDistrictName())){
+                                Intent intent = new Intent();
+                                intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
+                                getActivity().setResult(2,intent);
+                                getActivity().finish();
+                            }else {
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TipDialog tipDialog = new TipDialog(getActivity(),1);
+                                        tipDialog.show();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
                 }
             }
         });
         adapter.setOnItemClickListener(new DistrictChooseAdapter.OnItemClickListener() { //条目点击事件处理
             @Override
-            public void onItemClick(View view, int position) {
-                Intent intent = new Intent();
-                intent.putExtra("cityName",districtList.get(position).getDistrictName());
-                getActivity().setResult(2,intent);
-                Toast.makeText(getActivity(),"你选择了 "+districtList.get(position).getDistrictName(),Toast.LENGTH_SHORT).show();
-                getActivity().finish();
+            public void onItemClick(View view, final int position) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //先检查网络是否可用
+                        if (!NetWorkUtils.checkNetState(getActivity())){
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    TipDialog tipDialog = new TipDialog(getActivity(),0);
+                                    tipDialog.show();
+                                }
+                            });
+                            return;
+                        }
+//                        Log.d("asfadfsdfsf","线程是否还在执行");
+                        //再检查是否有改城市的天气预报
+                        if (Utils.hasWeather(districtList.get(position).getDistrictName())){
+                            Intent intent = new Intent();
+                            intent.putExtra("cityName",districtList.get(position).getDistrictName());
+                            getActivity().setResult(2,intent);
+//                Toast.makeText(getActivity(),"你选择了 "+districtList.get(position).getDistrictName(),Toast.LENGTH_SHORT).show();
+                            getActivity().finish();
+                        }else {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    TipDialog tipDialog = new TipDialog(getActivity(),1);
+                                    tipDialog.show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
+            }
+        });
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed(); //交给activity处理，返回上一级
             }
         });
         recyclerView.setAdapter(adapter);

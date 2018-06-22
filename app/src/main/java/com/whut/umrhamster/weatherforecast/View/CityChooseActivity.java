@@ -42,26 +42,48 @@ public class CityChooseActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK){
-            if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentCityChoose){  //从city选择界面返回，则显示省份
-                FragmentManager fm = getSupportFragmentManager();
-                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,new FragmentProvinceChoose()).commit();
-                return true;
-            }else if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentProvinceChoose){
-//                Log.d("CityChooseActivity","province");
-                finish();
-                overridePendingTransition(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out);
-            }else if (getSupportFragmentManager().getFragments().get(0) instanceof  FragmentDistrictChoose){
-                Bundle bundle = new Bundle();
-//                Log.d("CityChooseActivity",getSupportFragmentManager().getFragments().get(0).getArguments().getString("provinceName"));
-                bundle.putSerializable("province",(getSupportFragmentManager().getFragments().get(0).getArguments().getSerializable("province")));
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentCityChoose fragmentCityChoose = new FragmentCityChoose();
-                fragmentCityChoose.setArguments(bundle);
-                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,fragmentCityChoose).commit();
-                return true;
-            }
-        }
+//        if (keyCode == KeyEvent.KEYCODE_BACK){
+//            if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentCityChoose){  //从city选择界面返回，则显示省份
+//                FragmentManager fm = getSupportFragmentManager();
+//                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,new FragmentProvinceChoose()).commit();
+//                return true;
+//            }else if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentProvinceChoose){
+////                Log.d("CityChooseActivity","province");
+//                finish();
+//                overridePendingTransition(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out);
+//            }else if (getSupportFragmentManager().getFragments().get(0) instanceof  FragmentDistrictChoose){
+//                Bundle bundle = new Bundle();
+////                Log.d("CityChooseActivity",getSupportFragmentManager().getFragments().get(0).getArguments().getString("provinceName"));
+//                bundle.putSerializable("province",(getSupportFragmentManager().getFragments().get(0).getArguments().getSerializable("province")));
+//                FragmentManager fm = getSupportFragmentManager();
+//                FragmentCityChoose fragmentCityChoose = new FragmentCityChoose();
+//                fragmentCityChoose.setArguments(bundle);
+//                fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,fragmentCityChoose).commit();
+//                return true;
+//            }
+//        }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentCityChoose){  //从city选择界面返回，则显示省份
+            FragmentManager fm = getSupportFragmentManager();
+            fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,new FragmentProvinceChoose()).commit();
+            return ;
+        }else if (getSupportFragmentManager().getFragments().get(0) instanceof FragmentProvinceChoose){
+//                Log.d("CityChooseActivity","province");
+            finish();
+            overridePendingTransition(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out);
+        }else if (getSupportFragmentManager().getFragments().get(0) instanceof  FragmentDistrictChoose){
+            Bundle bundle = new Bundle();
+//                Log.d("CityChooseActivity",getSupportFragmentManager().getFragments().get(0).getArguments().getString("provinceName"));
+            bundle.putSerializable("province",(getSupportFragmentManager().getFragments().get(0).getArguments().getSerializable("province")));
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentCityChoose fragmentCityChoose = new FragmentCityChoose();
+            fragmentCityChoose.setArguments(bundle);
+            fm.beginTransaction().setCustomAnimations(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out).replace(R.id.ac_citychoose_cl,fragmentCityChoose).commit();
+            return ;
+        }
     }
 }

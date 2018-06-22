@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_tip_bg">
+    <TextView
+        android:id="@+id/dialog_tip_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textColor="@android:color/black"
+        android:layout_centerHorizontal="true"
+        android:textSize="16sp"
+        android:text="@string/tip"/>
+    <TextView
+        android:id="@+id/dialog_tip_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dialog_tip_title"
+        android:paddingBottom="20dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:layout_centerInParent="true"
+        android:textColor="@android:color/darker_gray"
+        android:text="@string/tipContentNet"/>
+    <View
+        android:id="@+id/dialog_tip_divider_v"
+        android:layout_below="@id/dialog_tip_content"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#e3dee2"/>
+    <TextView
+        android:id="@+id/dialog_tip_btn_tv"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:layout_below="@id/dialog_tip_divider_v"
+        android:background="@drawable/dialog_tip_btn_bg"
+        android:text="@string/queding"
+        android:textSize="16sp"
+        />
+
+</RelativeLayout>

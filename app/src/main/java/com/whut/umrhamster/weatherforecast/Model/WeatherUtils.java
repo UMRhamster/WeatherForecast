@@ -22,14 +22,24 @@ public class WeatherUtils {
 
     public static int getImgbyType(String type){
         switch (type){
+            case "晴":
+                return R.drawable.qingtian;
             case "阴":
                 return R.drawable.yintian;
             case "小雨":
                 return R.drawable.xiaoyu;
+            case "中雨":
+                return R.drawable.zhongyu;
+            case "大雨":
+                return R.drawable.dayu;
             case "多云":
                 return R.drawable.duoyun;
+            case "阵雨":
+                return R.drawable.zhenyu;
+            case "雷阵雨":
+                return R.drawable.leizhenyu;
             default:
-                return R.drawable.qingtian;
+                return R.drawable.shachenbao;
         }
     }
 }

@@ -222,4 +222,26 @@ public class Utils {
     public static String correctCityName(String cityName){
         return cityName.replace("市","");
     }
+
+    //检测所选择的城市是否 有天气预报
+    public static boolean hasWeather(String cityName){
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("http://wthrcdn.etouch.cn/weather_mini?city="+cityName)
+                .build();
+        Response response = null;
+        try {
+            response = okHttpClient.newCall(request).execute();
+            String json = response.body().string();
+            JSONObject jsonObject = new JSONObject(json);
+            if (jsonObject.getInt("status") == 1000){
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
