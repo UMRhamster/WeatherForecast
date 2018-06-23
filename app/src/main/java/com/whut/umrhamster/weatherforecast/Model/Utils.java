@@ -36,6 +36,11 @@ public class Utils {
             weather.setCity(jsonData.getString("city"));      //设置城市
             weather.setGanmao(jsonData.getString("ganmao"));  //设置感冒指数
             weather.setWendu(jsonData.getString("wendu"));    //设置体感温度
+            if (jsonData.has("aqi")){
+                weather.setAqi(jsonData.getString("aqi"));
+            }else {
+                weather.setAqi("无");
+            }
             //
             DailyWeather yesterday = new DailyWeather();
             JSONObject yesterdayJson = jsonData.getJSONObject("yesterday");
@@ -170,7 +175,7 @@ public class Utils {
                 String id = (String) iterator.next();
                 Province province = new Province();
                 province.setProvinceId(id);
-                Log.d("Utilsprovince",String.valueOf(province.getProvinceId()));
+//                Log.d("Utilsprovince",String.valueOf(province.getProvinceId()));
                 province.setProvinceName(jsonObject.getString(id));
                 province.save();
             }
@@ -243,5 +248,20 @@ public class Utils {
             e.printStackTrace();
         }
         return false;
+    }
+
+    //查询所有城市，并加入到数据库
+    public static void initAllCitys(){
+        queryFromServer("http://www.weather.com.cn/data/city3jdata/china.html","province","");
+        List<Province> provinceList = LitePal.findAll(Province.class);
+        for (int i=0;i<provinceList.size();i++){
+            queryFromServer("http://www.weather.com.cn/data/city3jdata/provshi/"+provinceList.get(i).getProvinceId()+".html","city",provinceList.get(i).getProvinceId());
+        }
+        List<City> cityList = LitePal.findAll(City.class);
+        for (int i=0;i<cityList.size();i++){
+            queryFromServer("http://www.weather.com.cn/data/city3jdata/station/"+cityList.get(i).getCityId()+".html","district",cityList.get(i).getCityId());
+        }
+        provinceList = null;
+        cityList = null;
     }
 }

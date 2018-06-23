@@ -8,4 +8,10 @@
     <string name="tipContentWeather">抱歉！暂无您所选择地区的天气预报，建议选择市级城市查看天气预报。</string>
     <string name="tipContentUnknow">抱歉！发生了未知错误。</string>
     <string name="queding">确定</string>
+    <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
+    <string name="temperature">°</string>
+    <string name="aqi">当前空气质量指数：%1$s</string>
+    <string name="aqiNo">暂无该地区空气质量指数</string>
+    <string name="date">%1$s/%2$s</string>
 </resources>

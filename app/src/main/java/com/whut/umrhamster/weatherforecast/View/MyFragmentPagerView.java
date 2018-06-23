@@ -11,8 +11,8 @@ import java.util.List;
  */
 
 public class MyFragmentPagerView extends FragmentPagerAdapter {
-    private List<Fragment> fragmentList;
-    public MyFragmentPagerView(FragmentManager fm,List<Fragment> fragmentList) {
+    private List<FragmentWeather> fragmentList;
+    public MyFragmentPagerView(FragmentManager fm,List<FragmentWeather> fragmentList) {
         super(fm);
         this.fragmentList = fragmentList;
     }

@@ -8,8 +8,8 @@ import com.whut.umrhamster.weatherforecast.R;
 
 public class WeatherUtils {
     //"高温 31°C"
-    public static String getTemperatureNumber(String temperature){
-        return temperature.substring(3,temperature.length()-1);
+    public static String getTemperatureFormated(String temperature){
+        return temperature.substring(3,temperature.length()-1)+"°";
     }
 
     public static float getTemperatureFloat(String temperature){
@@ -27,6 +27,7 @@ public class WeatherUtils {
             case "阴":
                 return R.drawable.yintian;
             case "小雨":
+            case "小到中雨":
                 return R.drawable.xiaoyu;
             case "中雨":
                 return R.drawable.zhongyu;

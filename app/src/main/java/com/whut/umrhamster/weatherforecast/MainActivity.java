@@ -47,12 +47,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewTitle;
     private ViewPager viewPager;
     private MyFragmentPagerView myFragmentPagerView;
-    private List<Fragment> fragmentList;   //用于存储显示天气预报的fragment
+    private List<FragmentWeather> fragmentList;   //用于存储显示天气预报的fragment
     private boolean isLocated = false;             //是否第一次定位
     private LinearLayout linearLayout;
 //    private List<String> cityNameList;  //用于保存城市名，防止viewpager快速滑动崩溃问题
     //维护一个List<Weather> 用于管理各城市天气，也可以解决上述快速滑动，weather对象为null导致崩溃问题
     private List<Weather> weatherList;
+    //维护一个position保存当前位置
+    private int currentPosition = 0;
 
     private CoordinatorLayout coordinatorLayout;
 
@@ -115,11 +117,51 @@ public class MainActivity extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                if (fragmentList.size() > 1){
+                    if (currentPosition == 0){
+                        fragmentList.get(1).setScrollTo(fragmentList.get(0).getScrollPosition());
+                        fragmentList.get(1).setAlpha(fragmentList.get(0).getAlpha());
+                    }else if (currentPosition == fragmentList.size()-1){
+                        fragmentList.get(fragmentList.size()-2).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
+                        fragmentList.get(fragmentList.size()-2).setAlpha(fragmentList.get(currentPosition).getAlpha());
+                    }else {
+                        fragmentList.get(currentPosition-1).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
+                        fragmentList.get(currentPosition-1).setAlpha(fragmentList.get(currentPosition).getAlpha());
+                        if (fragmentList.get(currentPosition+1).isVisible()){  //先判断fragment是否已经可见
+                            fragmentList.get(currentPosition+1).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
+                            fragmentList.get(currentPosition+1).setAlpha(fragmentList.get(currentPosition).getAlpha());
+                        }
+                    }
+                }
             }
 
             @Override
             public void onPageSelected(int position) {
+                currentPosition = position;
+                switch (weatherList.get(position).getForecast().get(0).getType()){
+                    case "晴":
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.main_bg);
+                        break;
+                    case "小雨":      //
+                    case "小到中雨":  //两者显示一样
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_rain);
+                        break;
+                    case "多云":
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_duoyun);
+                        break;
+                    case "阴":
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_ying);
+                        break;
+                    case "暴雨":
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_baoyu);
+                        break;
+                    case "阵雨":
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_zhenyu);
+                        break;
+                    default:
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.main_bg);
+                        break;
+                }
 //                Log.d("MainActivity","onPageSelected");
 //                textViewTitle.setText(cityNameList.get(position));
                 textViewTitle.setText(weatherList.get(position).getCity());
@@ -210,10 +252,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void changeColor(){
-        TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{getResources().getDrawable(R.mipmap.main_bg,null),
-                getResources().getDrawable(R.mipmap.bg_rain,null)});
+    private void changeBackGround(Drawable oldBg, int newBg){
+        TransitionDrawable transitionDrawable = new TransitionDrawable(new Drawable[]{oldBg,
+                getResources().getDrawable(newBg,null)});
         coordinatorLayout.setBackground(transitionDrawable);
-        transitionDrawable.startTransition(2000);
+        transitionDrawable.startTransition(800);
+    }
+
+    //跟随fragmentweather一起改变透明度
+    public void setAlpha(int alpha){
+        toolbar.setBackgroundColor(Color.argb(alpha,0,0,0));
     }
 }
