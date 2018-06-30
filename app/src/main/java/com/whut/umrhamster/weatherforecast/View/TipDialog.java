@@ -14,12 +14,12 @@ import com.whut.umrhamster.weatherforecast.R;
  */
 
 public class TipDialog extends Dialog {
-    private int problemType = -1;  //问题类型   0-网络问题，1-城市无天气预报
+    private String tip; //提示
     private TextView textViewContent; //提示内容
     private TextView textViewbtn; //确定按钮
-    public TipDialog(@NonNull Context context,int problemType) {
+    public TipDialog(@NonNull Context context,String tip) {
         super(context, R.style.CustomDialog);
-        this.problemType = problemType;
+        this.tip = tip;
     }
 
     @Override
@@ -32,13 +32,7 @@ public class TipDialog extends Dialog {
     private void initView(){
         textViewbtn = findViewById(R.id.dialog_tip_btn_tv);
         textViewContent = findViewById(R.id.dialog_tip_content);
-        if (problemType == 0){
-            textViewContent.setText(getContext().getResources().getString(R.string.tipContentNet));
-        }else if (problemType == 1){
-            textViewContent.setText(getContext().getResources().getString(R.string.tipContentWeather));
-        }else {
-            textViewContent.setText(getContext().getResources().getString(R.string.tipContentUnknow));
-        }
+        textViewContent.setText(tip);
         textViewbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -6,13 +6,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -23,12 +21,13 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
-import com.whut.umrhamster.weatherforecast.Model.District;
+import com.whut.umrhamster.weatherforecast.Model.DailyWeather;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.Model.Weather;
-import com.whut.umrhamster.weatherforecast.View.CitySearchActivity;
+import com.whut.umrhamster.weatherforecast.Model.WeatherUtils;
 import com.whut.umrhamster.weatherforecast.View.FragmentWeather;
 import com.whut.umrhamster.weatherforecast.View.MyFragmentPagerView;
+import com.whut.umrhamster.weatherforecast.View.WeatherManagementActivity;
 
 import org.litepal.LitePal;
 
@@ -65,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         LitePal.initialize(this);   //初始化litepal
 
+//        LitePal.deleteAll(Weather.class);
+//        LitePal.deleteAll(DailyWeather.class);
+
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -76,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
         initEvent();  //初始化事件
         mLocationClient.start();
 
+        //天气数据 数据库
+        List<Weather> weathers = LitePal.findAll(Weather.class);
+        Log.d("MainActivity","数据库中天气数据数量为："+weathers.size());
+        Log.d("MainActivity","数据库中每日天气数量为："+LitePal.count(DailyWeather.class));
     }
 
 
@@ -86,31 +92,32 @@ public class MainActivity extends AppCompatActivity {
         mLocationClient.setLocOption(option);
     }
     private void initView(){
-        weatherList = new ArrayList<>();
         toolbar = findViewById(R.id.main_tb);
         textViewTitle = findViewById(R.id.main_cityname_tv);
         viewPager = findViewById(R.id.main_vp);
         linearLayout = findViewById(R.id.main_tb_ll);
+        coordinatorLayout = findViewById(R.id.main_cl);
         fragmentList = new ArrayList<>();
+        weatherList = LitePal.findAll(Weather.class,true); //从数据库中获取天气信息,注意 需要激进查找
+        initWeatherFragment();   //初始化天气卡片，显示数据中已经存在的天气
 //        cityNameList = new ArrayList<>();
         myFragmentPagerView = new MyFragmentPagerView(getSupportFragmentManager(),fragmentList);
         viewPager.setAdapter(myFragmentPagerView);
         //背景
-        coordinatorLayout = findViewById(R.id.main_cl);
 //        changeColor();
     }
     private void initEvent(){
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(MainActivity.this, CitySearchActivity.class),3);
+                startActivityForResult(new Intent(MainActivity.this, WeatherManagementActivity.class),3);
                 overridePendingTransition(R.anim.anim_fg_enter,R.anim.anim_do_nothing);
             }
         });
         textViewTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(MainActivity.this,CitySearchActivity.class),3);
+                startActivityForResult(new Intent(MainActivity.this,WeatherManagementActivity.class),3);
                 overridePendingTransition(R.anim.anim_fg_enter,R.anim.anim_do_nothing);
             }
         });
@@ -119,14 +126,20 @@ public class MainActivity extends AppCompatActivity {
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (fragmentList.size() > 1){
                     if (currentPosition == 0){
-                        fragmentList.get(1).setScrollTo(fragmentList.get(0).getScrollPosition());
-                        fragmentList.get(1).setAlpha(fragmentList.get(0).getAlpha());
+                        if(fragmentList.get(1).isVisible()){
+                            fragmentList.get(1).setScrollTo(fragmentList.get(0).getScrollPosition());
+                            fragmentList.get(1).setAlpha(fragmentList.get(0).getAlpha());
+                        }
                     }else if (currentPosition == fragmentList.size()-1){
-                        fragmentList.get(fragmentList.size()-2).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
-                        fragmentList.get(fragmentList.size()-2).setAlpha(fragmentList.get(currentPosition).getAlpha());
+                        if (fragmentList.get(fragmentList.size()-2).isVisible()){
+                            fragmentList.get(fragmentList.size()-2).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
+                            fragmentList.get(fragmentList.size()-2).setAlpha(fragmentList.get(currentPosition).getAlpha());
+                        }
                     }else {
-                        fragmentList.get(currentPosition-1).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
-                        fragmentList.get(currentPosition-1).setAlpha(fragmentList.get(currentPosition).getAlpha());
+                        if (fragmentList.get(currentPosition-1).isVisible()){
+                            fragmentList.get(currentPosition-1).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
+                            fragmentList.get(currentPosition-1).setAlpha(fragmentList.get(currentPosition).getAlpha());
+                        }
                         if (fragmentList.get(currentPosition+1).isVisible()){  //先判断fragment是否已经可见
                             fragmentList.get(currentPosition+1).setScrollTo(fragmentList.get(currentPosition).getScrollPosition());
                             fragmentList.get(currentPosition+1).setAlpha(fragmentList.get(currentPosition).getAlpha());
@@ -138,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 currentPosition = position;
-                switch (weatherList.get(position).getForecast().get(0).getType()){
+                switch (weatherList.get(position).getForecast().get(1).getType()){ //背景渐变替换
                     case "晴":
                         changeBackGround(coordinatorLayout.getBackground(),R.mipmap.main_bg);
                         break;
@@ -153,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                         changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_ying);
                         break;
                     case "暴雨":
-                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_baoyu);
+                        changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_leizhenyu);
                         break;
                     case "阵雨":
                         changeBackGround(coordinatorLayout.getBackground(),R.mipmap.bg_zhenyu);
@@ -183,15 +196,33 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
             if (!isLocated){
-                textViewTitle.setText(Utils.correctCityName(bdLocation.getCity()));    //获得地区名，例如：武昌区
+//                textViewTitle.setText(Utils.correctCityName(bdLocation.getCity()));    //获得地区名，例如：武昌区
                 //通过定位获得地区名，创建fragment
-                getWeatherData(Utils.correctCityName(bdLocation.getCity()));
+                if (LitePal.isExist(Weather.class,"city = ?",Utils.correctCityName(bdLocation.getCity()))){
+                    getWeatherData(Utils.correctCityName(bdLocation.getCity()));
+                }
 //                addFragment(Utils.correctCityName(bdLocation.getCity()));
                 isLocated = true;
             }
         }
     }
-
+    //初始化天气数据，从数据库中添加
+    private void initWeatherFragment(){
+        if (weatherList.size() >0){
+            //设置初始化标题
+            textViewTitle.setText(weatherList.get(0).getCity());
+            //设置初始化背景
+            coordinatorLayout.setBackground(getDrawable(WeatherUtils.getBGbyType(weatherList.get(0).getForecast().get(1).getType())));
+        }
+        for (int i=0;i<weatherList.size();i++){
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("weather",weatherList.get(i));
+            FragmentWeather fragmentWeather = new FragmentWeather();
+            fragmentWeather.setArguments(bundle);
+            fragmentList.add(fragmentWeather);
+            addTagPoint();
+        }
+    }
     private void addFragment(final Weather weather){
 //        cityNameList.add(cityName);
 
@@ -206,15 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 fragmentList.add(fragmentWeather);
                 myFragmentPagerView.notifyDataSetChanged();
 
-                ImageView imageView = new ImageView(getApplicationContext());
-                if (linearLayout.getChildCount() == 0){
-                    imageView.setImageResource(R.drawable.point_bright);  //如何之前没有天气卡片，则默认显示第一个被选中，且只有一个，亮色
-                }else {
-                    imageView.setImageResource(R.drawable.point_dark);    //如果已经有天气卡片，则默认不被选中，为暗色
-                }
-                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(Utils.dp2px(getApplicationContext(),10),Utils.dp2px(getApplicationContext(),10));
-                imageView.setLayoutParams(param);
-                linearLayout.addView(imageView);
+                addTagPoint();
             }
         });
     }
@@ -234,6 +257,12 @@ public class MainActivity extends AppCompatActivity {
                     response = okHttpClient.newCall(request).execute();
                     String json = response.body().string();
                     Weather weather = Utils.Json2Weather(json);  //构造weather对象，
+//                    weather.getYesterday().save();
+                    for (int i=0;i<6;i++){
+                        weather.getForecast().get(i).save();
+                    }
+                    weather.save();
+//                    SPUtils.saveWeather(getApplicationContext(),weather.getCity(),SPUtils.serialize(weather)); //使用shareprefence存储
                     weatherList.add(weather); //添加到集合中
                     addFragment(weather);   //生成天气界面
                 } catch (IOException e) {
@@ -243,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -250,6 +280,18 @@ public class MainActivity extends AppCompatActivity {
             getWeatherData(data.getStringExtra("cityName"));
 //            addFragment(data.getStringExtra("cityName"));
         }
+        if (requestCode == 3 && resultCode == 7){
+            updateWeather();
+        }
+    }
+
+    private void updateWeather(){
+        Log.d("MainActivity","update");
+        weatherList = LitePal.findAll(Weather.class,true);
+        fragmentList.clear();
+        linearLayout.removeAllViews();
+        initWeatherFragment();
+        myFragmentPagerView.notifyDataSetChanged();
     }
 
     private void changeBackGround(Drawable oldBg, int newBg){
@@ -262,5 +304,17 @@ public class MainActivity extends AppCompatActivity {
     //跟随fragmentweather一起改变透明度
     public void setAlpha(int alpha){
         toolbar.setBackgroundColor(Color.argb(alpha,0,0,0));
+    }
+
+    private void addTagPoint(){
+        ImageView imageView = new ImageView(getApplicationContext());
+        if (linearLayout.getChildCount() == 0){
+            imageView.setImageResource(R.drawable.point_bright);  //如何之前没有天气卡片，则默认显示第一个被选中，且只有一个，亮色
+        }else {
+            imageView.setImageResource(R.drawable.point_dark);    //如果已经有天气卡片，则默认不被选中，为暗色
+        }
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(Utils.dp2px(getApplicationContext(),10),Utils.dp2px(getApplicationContext(),10));
+        imageView.setLayoutParams(param);
+        linearLayout.addView(imageView);
     }
 }

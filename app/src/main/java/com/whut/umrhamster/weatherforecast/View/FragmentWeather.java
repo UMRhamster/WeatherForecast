@@ -141,7 +141,7 @@ public class FragmentWeather extends Fragment {
     }
     private void initData(){
         weather = (Weather) getArguments().getSerializable("weather");
-        DailyWeather today = weather.getForecast().get(0);
+        DailyWeather today = weather.getForecast().get(1);
         textViewTemperature.setText(weather.getWendu());
         if (weather.getAqi().equals("无")){
             textViewAqi.setText(getResources().getString(R.string.aqiNo));
@@ -159,16 +159,16 @@ public class FragmentWeather extends Fragment {
         ChartUtils.initChart(lineChart,weather);
         ChartUtils.setChartData(getActivity().getApplicationContext(),lineChart,weather);
 
-        textViewThird.setText(Utils.getWeekByString(weather.getForecast().get(1).getDate()));
-        textViewForth.setText(Utils.getWeekByString(weather.getForecast().get(2).getDate()));
-        textViewFifth.setText(Utils.getWeekByString(weather.getForecast().get(3).getDate()));
-        textViewSixth.setText(Utils.getWeekByString(weather.getForecast().get(4).getDate()));
-        imageViewYesterday.setImageResource(WeatherUtils.getImgbyType(weather.getYesterday().getType()));
-        imageViewToday.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(0).getType()));
-        imageViewThird.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(1).getType()));
-        imageViewForth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(2).getType()));
-        imageViewFifth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(3).getType()));
-        imageViewSixth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(4).getType()));
+        textViewThird.setText(Utils.getWeekByString(weather.getForecast().get(2).getDate()));
+        textViewForth.setText(Utils.getWeekByString(weather.getForecast().get(3).getDate()));
+        textViewFifth.setText(Utils.getWeekByString(weather.getForecast().get(4).getDate()));
+        textViewSixth.setText(Utils.getWeekByString(weather.getForecast().get(5).getDate()));
+        imageViewYesterday.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(0).getType()));
+        imageViewToday.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(1).getType()));
+        imageViewThird.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(2).getType()));
+        imageViewForth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(3).getType()));
+        imageViewFifth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(4).getType()));
+        imageViewSixth.setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(5).getType()));
         //
         textViewTip.setText(weather.getGanmao());
         calendar.add(Calendar.DAY_OF_MONTH,-1);
@@ -181,13 +181,13 @@ public class FragmentWeather extends Fragment {
             calendar.add(Calendar.DAY_OF_MONTH,+1);
         }
         //三天情况数据加入
-        textViewThree[0].setText(Utils.getWeekByString(weather.getForecast().get(1).getDate()));
-        textViewThree[1].setText(Utils.getWeekByString(weather.getForecast().get(2).getDate()));
+        textViewThree[0].setText(Utils.getWeekByString(weather.getForecast().get(2).getDate()));
+        textViewThree[1].setText(Utils.getWeekByString(weather.getForecast().get(3).getDate()));
         for (int i=0;i<3;i++){
-            imageViewsThree[i].setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(i).getType()));
-            textViewsThreeHigh[i].setText(WeatherUtils.getTemperatureFormated(weather.getForecast().get(i).getHigh()));
-            textViewsThreeLow[i].setText(WeatherUtils.getTemperatureFormated(weather.getForecast().get(i).getLow()));
-            textViewsThreeType[i].setText(weather.getForecast().get(i).getType());
+            imageViewsThree[i].setImageResource(WeatherUtils.getImgbyType(weather.getForecast().get(i+1).getType()));
+            textViewsThreeHigh[i].setText(WeatherUtils.getTemperatureFormated(weather.getForecast().get(i+1).getHigh()));
+            textViewsThreeLow[i].setText(WeatherUtils.getTemperatureFormated(weather.getForecast().get(i+1).getLow()));
+            textViewsThreeType[i].setText(weather.getForecast().get(i+1).getType());
         }
 //        new Thread(){
 //            @Override

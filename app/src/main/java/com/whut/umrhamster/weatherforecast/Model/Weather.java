@@ -1,5 +1,6 @@
 package com.whut.umrhamster.weatherforecast.Model;
 
+import org.litepal.LitePal;
 import org.litepal.crud.LitePalSupport;
 
 import java.io.Serializable;
@@ -11,23 +12,33 @@ import java.util.List;
 
 //总天气情况
 public class Weather extends LitePalSupport implements Serializable{
-    private DailyWeather yesterday;        //昨天天气
-    private List<DailyWeather> forecast;   //今天及以后天气情况
+    private int id;
+//    private DailyWeather yesterday;        //昨天天气
+    private List<DailyWeather> forecast;   //今天及以后天气情况   *昨天也加入其中
     private String city;                   //城市
     private String ganmao;                 //感冒指数
     private String wendu;                  //体感温度
     private String aqi;                    //空气质量指数
 
-    public DailyWeather getYesterday() {
-        return yesterday;
+    public int getId() {
+        return id;
     }
 
-    public void setYesterday(DailyWeather yesterday) {
-        this.yesterday = yesterday;
+    public void setId(int id) {
+        this.id = id;
     }
+
+//    public DailyWeather getYesterday() {
+//        return yesterday;
+//    }
+//
+//    public void setYesterday(DailyWeather yesterday) {
+//        this.yesterday = yesterday;
+//    }
 
     public List<DailyWeather> getForecast() {
         return forecast;
+//        return LitePal.where("id = ?",String.valueOf(id)).find(DailyWeather.class);
     }
 
     public void setForecast(List<DailyWeather> forecast) {

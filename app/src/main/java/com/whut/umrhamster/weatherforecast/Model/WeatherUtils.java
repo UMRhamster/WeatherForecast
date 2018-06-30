@@ -43,4 +43,26 @@ public class WeatherUtils {
                 return R.drawable.shachenbao;
         }
     }
+
+    public static int getBGbyType(String type){
+        switch (type){
+            case "晴":
+                return R.mipmap.main_bg;
+            case "阴":
+                return R.mipmap.bg_ying;
+            case "小雨":
+            case "小到中雨":
+            case "中雨":
+            case "大雨":
+                return R.mipmap.bg_rain;
+            case "阵雨":
+                return R.mipmap.bg_zhenyu;
+            case "雷阵雨":
+                return R.mipmap.bg_leizhenyu;
+            case "多云":
+                return R.mipmap.bg_duoyun;
+            default:
+                return R.mipmap.main_bg;
+        }
+    }
 }

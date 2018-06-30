@@ -48,6 +48,7 @@
 
         <activity android:name=".View.CitySearchActivity" />
         <activity android:name=".View.CityChooseActivity" />
+        <activity android:name=".View.WeatherManagementActivity"></activity>
     </application>
 
 </manifest>

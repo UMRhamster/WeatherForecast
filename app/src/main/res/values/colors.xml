@@ -7,4 +7,7 @@
 
     <color name="redPopular">#f74d61</color>
     <color name="bluePopular">#29a9ff</color>
+    <color name="defaultColor">#fafafa</color>
+    <color name="hotCityTextColor">#363636</color>
+    <color name="hotCityTextColorChoosen">#b8b8b8</color>
 </resources>

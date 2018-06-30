@@ -9,12 +9,21 @@ import java.io.Serializable;
  */
 
 public class DailyWeather extends LitePalSupport implements Serializable{
+    private int id;
     private String date;  //日期, 13号星期五
     private String high;  //最高温度
     private String low;   //最低温度
     private String fx;    //风向
     private String fl;    //风力
     private String type;  //天气类型
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getDate() {
         return date;

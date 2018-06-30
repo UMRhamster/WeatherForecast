@@ -90,7 +90,7 @@ public class FragmentProvinceChoose extends Fragment {
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        TipDialog tipDialog = new TipDialog(getActivity(),0);
+                                        TipDialog tipDialog = new TipDialog(getActivity(),getResources().getString(R.string.tipContentNet));
                                         tipDialog.show();
                                     }
                                 });
@@ -106,7 +106,7 @@ public class FragmentProvinceChoose extends Fragment {
                                 handler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        TipDialog tipDialog = new TipDialog(getActivity(),1);
+                                        TipDialog tipDialog = new TipDialog(getActivity(),getResources().getString(R.string.tipContentWeather));
                                         tipDialog.show();
                                     }
                                 });

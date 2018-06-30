@@ -42,6 +42,7 @@ public class Utils {
                 weather.setAqi("无");
             }
             //
+            List<DailyWeather> forecast = new ArrayList<>();
             DailyWeather yesterday = new DailyWeather();
             JSONObject yesterdayJson = jsonData.getJSONObject("yesterday");
             yesterday.setDate(yesterdayJson.getString("date"));
@@ -50,10 +51,9 @@ public class Utils {
             yesterday.setHigh(yesterdayJson.getString("high"));
             yesterday.setLow(yesterdayJson.getString("low"));
             yesterday.setType(yesterdayJson.getString("type"));
-            weather.setYesterday(yesterday);                           //设置昨天天气
+            forecast.add(yesterday);                           //设置昨天天气
             JSONArray jsonArray = jsonData.getJSONArray("forecast");
             //
-            List<DailyWeather> forecast = new ArrayList<>();
             for (int i=0;i<5;i++){                                     //依次添加五天的天气对象
                 DailyWeather forecastWeather = new DailyWeather();
                 forecastWeather.setDate(jsonArray.getJSONObject(i).getString("date"));

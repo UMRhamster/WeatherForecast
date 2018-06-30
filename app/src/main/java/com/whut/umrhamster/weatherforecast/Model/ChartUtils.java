@@ -152,8 +152,8 @@ public class ChartUtils {
 //    }
 
     public static int getMaxTemperature(Weather weather){
-        int max = WeatherUtils.getTemperatureInt(weather.getYesterday().getHigh());
-        for (int i =0;i<5;i++){
+        int max = WeatherUtils.getTemperatureInt(weather.getForecast().get(0).getHigh());
+        for (int i =1;i<6;i++){
             int temp = WeatherUtils.getTemperatureInt(weather.getForecast().get(i).getHigh());
             if (max < temp){
                 max = temp;
@@ -163,8 +163,8 @@ public class ChartUtils {
     }
 
     public static int getMinTemperature(Weather weather){
-        int min = WeatherUtils.getTemperatureInt(weather.getYesterday().getLow());
-        for (int i=0;i<5;i++){
+        int min = WeatherUtils.getTemperatureInt(weather.getForecast().get(0).getLow());
+        for (int i=1;i<6;i++){
             int temp =WeatherUtils.getTemperatureInt(weather.getForecast().get(i).getLow());
             if (min > temp){
                 min = temp;
@@ -178,11 +178,11 @@ public class ChartUtils {
         ArrayList<Entry> highData = new ArrayList<>();
         ArrayList<Entry> lowData = new ArrayList<>();
 
-        highData.add(new Entry(0.5f,WeatherUtils.getTemperatureFloat(weather.getYesterday().getHigh())));
-        lowData.add(new Entry(0.5f,WeatherUtils.getTemperatureFloat(weather.getYesterday().getLow())));
-        for (int i=1;i<6;i++){
-            highData.add(new Entry(i+0.5f,WeatherUtils.getTemperatureFloat(weather.getForecast().get(i-1).getHigh())));
-            lowData.add(new Entry(i+0.5f,WeatherUtils.getTemperatureFloat(weather.getForecast().get(i-1).getLow())));
+//        highData.add(new Entry(0.5f,WeatherUtils.getTemperatureFloat(weather.getForecast().get(0).getHigh())));
+//        lowData.add(new Entry(0.5f,WeatherUtils.getTemperatureFloat(weather.getForecast().get(0).getLow())));
+        for (int i=0;i<6;i++){
+            highData.add(new Entry(i+0.5f,WeatherUtils.getTemperatureFloat(weather.getForecast().get(i).getHigh())));
+            lowData.add(new Entry(i+0.5f,WeatherUtils.getTemperatureFloat(weather.getForecast().get(i).getLow())));
         }
 
         //每一个LineDataSet对应一条连接线
@@ -219,7 +219,7 @@ public class ChartUtils {
             highSet.setValueFormatter(new IValueFormatter() {
                 @Override
                 public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                    if (dataSetIndex == 0){}
+//                    if (dataSetIndex == 0){}
                     return (int)value+"°";
                 }
             });
