@@ -5,4 +5,5 @@ package com.whut.umrhamster.weatherforecast.Controller;
  */
 
 public class Utils {
+    //应该将数据处理都放在这里
 }

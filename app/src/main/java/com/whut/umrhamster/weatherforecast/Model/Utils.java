@@ -114,7 +114,7 @@ public class Utils {
         List<Province> provinceList = null;
         provinceList = LitePal.findAll(Province.class);
         if (provinceList.size() > 0){
-            Log.d("Utils->Province","数据库目前有"+provinceList.size()+"条Province记录");
+//            Log.d("Utils->Province","数据库目前有"+provinceList.size()+"条Province记录");
             return provinceList;
         }else {
             queryFromServer("http://www.weather.com.cn/data/city3jdata/china.html","province","");
@@ -127,7 +127,7 @@ public class Utils {
         List<City> cityList = null;
         cityList = LitePal.where("provinceId = ?",id).find(City.class);
         if (cityList.size() > 0){
-            Log.d("Utils->City",String.valueOf(cityList.size()));
+//            Log.d("Utils->City",String.valueOf(cityList.size()));
             return cityList;
         }else {
             queryFromServer("http://www.weather.com.cn/data/city3jdata/provshi/"+id+".html","city",id);
@@ -139,7 +139,7 @@ public class Utils {
     public static List<District> queryDistrict(String cityId){
         List<District> districtList = LitePal.where("cityId = ?",cityId).find(District.class);
         if (districtList.size() > 0){
-            Log.d("Utils->District",String.valueOf(districtList.size()));
+//            Log.d("Utils->District",String.valueOf(districtList.size()));
             return districtList;
         }else {
             queryFromServer("http://www.weather.com.cn/data/city3jdata/station/"+cityId+".html","district",cityId);
@@ -252,16 +252,21 @@ public class Utils {
 
     //查询所有城市，并加入到数据库
     public static void initAllCitys(){
-        queryFromServer("http://www.weather.com.cn/data/city3jdata/china.html","province","");
-        List<Province> provinceList = LitePal.findAll(Province.class);
-        for (int i=0;i<provinceList.size();i++){
-            queryFromServer("http://www.weather.com.cn/data/city3jdata/provshi/"+provinceList.get(i).getProvinceId()+".html","city",provinceList.get(i).getProvinceId());
-        }
-        List<City> cityList = LitePal.findAll(City.class);
-        for (int i=0;i<cityList.size();i++){
-            queryFromServer("http://www.weather.com.cn/data/city3jdata/station/"+cityList.get(i).getCityId()+".html","district",cityList.get(i).getCityId());
-        }
-        provinceList = null;
-        cityList = null;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                queryFromServer("http://www.weather.com.cn/data/city3jdata/china.html","province","");
+                List<Province> provinceList = LitePal.findAll(Province.class);
+                for (int i=0;i<provinceList.size();i++){
+                    queryFromServer("http://www.weather.com.cn/data/city3jdata/provshi/"+provinceList.get(i).getProvinceId()+".html","city",provinceList.get(i).getProvinceId());
+                }
+                List<City> cityList = LitePal.findAll(City.class);
+                for (int i=0;i<cityList.size();i++){
+                    queryFromServer("http://www.weather.com.cn/data/city3jdata/station/"+cityList.get(i).getCityId()+".html","district",cityList.get(i).getCityId());
+                }
+                provinceList = null;
+                cityList = null;
+            }
+        }).start();
     }
 }

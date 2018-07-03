@@ -17,12 +17,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.whut.umrhamster.weatherforecast.Model.City;
 import com.whut.umrhamster.weatherforecast.Model.District;
 import com.whut.umrhamster.weatherforecast.Model.NetWorkUtils;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
+import com.whut.umrhamster.weatherforecast.Model.WeatherUtils;
 import com.whut.umrhamster.weatherforecast.R;
 
 import org.litepal.LitePal;
@@ -95,6 +97,16 @@ public class FragmentCityChoose extends Fragment {
                                     public void run() {
                                         TipDialog tipDialog = new TipDialog(getActivity(),getResources().getString(R.string.tipContentNet));
                                         tipDialog.show();
+                                    }
+                                });
+                                return;
+                            }
+                            //检查是否已有改城市
+                            if (WeatherUtils.hasCity(((District) objectList.get(position)).getDistrictName())){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getActivity(),"您已添加过"+((District) objectList.get(position)).getDistrictName()+",请选择其它城市",Toast.LENGTH_SHORT).show();
                                     }
                                 });
                                 return;

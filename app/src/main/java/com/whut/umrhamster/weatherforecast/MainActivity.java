@@ -1,5 +1,6 @@
 package com.whut.umrhamster.weatherforecast;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -21,12 +22,18 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.whut.umrhamster.weatherforecast.Controller.UpdateService;
+import com.whut.umrhamster.weatherforecast.Model.City;
 import com.whut.umrhamster.weatherforecast.Model.DailyWeather;
+import com.whut.umrhamster.weatherforecast.Model.District;
+import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.Model.Weather;
 import com.whut.umrhamster.weatherforecast.Model.WeatherUtils;
+import com.whut.umrhamster.weatherforecast.View.AskLocationDialog;
 import com.whut.umrhamster.weatherforecast.View.FragmentWeather;
 import com.whut.umrhamster.weatherforecast.View.MyFragmentPagerView;
+import com.whut.umrhamster.weatherforecast.View.TipDialog;
 import com.whut.umrhamster.weatherforecast.View.WeatherManagementActivity;
 
 import org.litepal.LitePal;
@@ -56,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private int currentPosition = 0;
 
     private CoordinatorLayout coordinatorLayout;
+    private Context context;
 
     Handler handler = new Handler();
     @Override
@@ -63,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LitePal.initialize(this);   //初始化litepal
-
+        if (LitePal.count(Province.class) < 1){
+            Utils.initAllCitys();
+        }
+        Intent intent = new Intent(this, UpdateService.class);
+        startService(intent);
 //        LitePal.deleteAll(Weather.class);
 //        LitePal.deleteAll(DailyWeather.class);
 
@@ -82,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
         List<Weather> weathers = LitePal.findAll(Weather.class);
         Log.d("MainActivity","数据库中天气数据数量为："+weathers.size());
         Log.d("MainActivity","数据库中每日天气数量为："+LitePal.count(DailyWeather.class));
+        Log.d("MainActivity","数据库中的省数量为："+LitePal.count(Province.class));
+        Log.d("MainActivity","数据库中的市数量为："+LitePal.count(City.class));
+        Log.d("MainActivity","数据库中的区数量为："+LitePal.count(District.class));
     }
 
 
@@ -92,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
         mLocationClient.setLocOption(option);
     }
     private void initView(){
+        context = this;
         toolbar = findViewById(R.id.main_tb);
         textViewTitle = findViewById(R.id.main_cityname_tv);
         viewPager = findViewById(R.id.main_vp);
@@ -99,12 +115,9 @@ public class MainActivity extends AppCompatActivity {
         coordinatorLayout = findViewById(R.id.main_cl);
         fragmentList = new ArrayList<>();
         weatherList = LitePal.findAll(Weather.class,true); //从数据库中获取天气信息,注意 需要激进查找
-        initWeatherFragment();   //初始化天气卡片，显示数据中已经存在的天气
-//        cityNameList = new ArrayList<>();
         myFragmentPagerView = new MyFragmentPagerView(getSupportFragmentManager(),fragmentList);
         viewPager.setAdapter(myFragmentPagerView);
-        //背景
-//        changeColor();
+        initWeatherFragment();   //初始化天气卡片，显示数据中已经存在的天气
     }
     private void initEvent(){
         toolbar.setOnClickListener(new View.OnClickListener() {
@@ -194,14 +207,20 @@ public class MainActivity extends AppCompatActivity {
     }
     public class MyLocationListener extends BDAbstractLocationListener{
         @Override
-        public void onReceiveLocation(BDLocation bdLocation) {
+        public void onReceiveLocation(final BDLocation bdLocation) {
             if (!isLocated){
-//                textViewTitle.setText(Utils.correctCityName(bdLocation.getCity()));    //获得地区名，例如：武昌区
-                //通过定位获得地区名，创建fragment
-                if (LitePal.isExist(Weather.class,"city = ?",Utils.correctCityName(bdLocation.getCity()))){
-                    getWeatherData(Utils.correctCityName(bdLocation.getCity()));
+                //通过定位获得城市名，判断是否已有该城市，若无，进行提示是否添加
+                if (!LitePal.isExist(Weather.class,"city = ?",Utils.correctCityName(bdLocation.getCity()))){
+//                    Log.d("MAINlOCATION",Utils.correctCityName(bdLocation.getCity()));
+                    AskLocationDialog askLocationDialog = new AskLocationDialog(context,String.format(getResources().getString(R.string.askLocation),Utils.correctCityName(bdLocation.getCity())));
+                    askLocationDialog.setOnClickListener(new AskLocationDialog.OnClickListener() {
+                        @Override
+                        public void onClick() {
+                            getWeatherData(Utils.correctCityName(bdLocation.getCity()));
+                        }
+                    });
+                    askLocationDialog.show();
                 }
-//                addFragment(Utils.correctCityName(bdLocation.getCity()));
                 isLocated = true;
             }
         }
@@ -222,10 +241,10 @@ public class MainActivity extends AppCompatActivity {
             fragmentList.add(fragmentWeather);
             addTagPoint();
         }
+        myFragmentPagerView.notifyDataSetChanged();
+//        Log.d("MainActivity update",myFragmentPagerView.getCount()+" "+viewPager.getChildCount());
     }
     private void addFragment(final Weather weather){
-//        cityNameList.add(cityName);
-
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -236,8 +255,11 @@ public class MainActivity extends AppCompatActivity {
 
                 fragmentList.add(fragmentWeather);
                 myFragmentPagerView.notifyDataSetChanged();
-
                 addTagPoint();
+                if (fragmentList.size() == 1){  //即是第一次添加
+                    textViewTitle.setText(weatherList.get(0).getCity());
+                    coordinatorLayout.setBackground(getDrawable(WeatherUtils.getBGbyType(weatherList.get(0).getForecast().get(1).getType())));
+                }
             }
         });
     }
@@ -257,12 +279,10 @@ public class MainActivity extends AppCompatActivity {
                     response = okHttpClient.newCall(request).execute();
                     String json = response.body().string();
                     Weather weather = Utils.Json2Weather(json);  //构造weather对象，
-//                    weather.getYesterday().save();
                     for (int i=0;i<6;i++){
                         weather.getForecast().get(i).save();
                     }
                     weather.save();
-//                    SPUtils.saveWeather(getApplicationContext(),weather.getCity(),SPUtils.serialize(weather)); //使用shareprefence存储
                     weatherList.add(weather); //添加到集合中
                     addFragment(weather);   //生成天气界面
                 } catch (IOException e) {
@@ -287,11 +307,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateWeather(){
         Log.d("MainActivity","update");
-        weatherList = LitePal.findAll(Weather.class,true);
+        weatherList.clear();
+        weatherList.addAll(LitePal.findAll(Weather.class,true));
+//        Log.d("MainActivity update",String.valueOf(weatherList.size()));
         fragmentList.clear();
+        viewPager.removeAllViews();
         linearLayout.removeAllViews();
         initWeatherFragment();
-        myFragmentPagerView.notifyDataSetChanged();
+//        myFragmentPagerView.notifyDataSetChanged();
     }
 
     private void changeBackGround(Drawable oldBg, int newBg){
@@ -317,4 +340,10 @@ public class MainActivity extends AppCompatActivity {
         imageView.setLayoutParams(param);
         linearLayout.addView(imageView);
     }
+
+    public void updateFragment(Bundle bundle) {
+        fragmentList.get(viewPager.getCurrentItem()).setArguments(bundle);
+        myFragmentPagerView.notifyDataSetChanged();
+    }
+
 }

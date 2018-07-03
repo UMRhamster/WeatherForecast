@@ -52,7 +52,9 @@ public class WeatherManagementAdapter extends RecyclerView.Adapter<RecyclerView.
             @Override
             public void onClick(View view) {
                 if (itemClickListener !=null ){
-                    itemClickListener.onItemClick(view,position,0); //0跳转
+                    if (!isEdit){
+                        itemClickListener.onItemClick(view,position,0); //0跳转
+                    }
                 }
             }
         });
@@ -94,7 +96,7 @@ public class WeatherManagementAdapter extends RecyclerView.Adapter<RecyclerView.
 
     @Override
     public int getItemCount() {
-        return weatherList.isEmpty()?0:weatherList.size()+1;
+        return weatherList.size()+1;
     }
 
     @Override

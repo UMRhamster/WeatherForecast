@@ -9,6 +9,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.whut.umrhamster.weatherforecast.MainActivity;
@@ -26,6 +28,8 @@ import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.Model.Weather;
 import com.whut.umrhamster.weatherforecast.Model.WeatherUtils;
 import com.whut.umrhamster.weatherforecast.R;
+
+import org.litepal.LitePal;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -73,12 +77,14 @@ public class FragmentWeather extends Fragment {
 
     private NestedScrollView scrollView;
     private RelativeLayout relativeLayout;
-//    Handler handler = new Handler();
+    private SwipeRefreshLayout swipeRefreshLayout;
+    Handler handler = new Handler();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_weather,container,false);
         initView(view);    //初始化控件
+        weather = (Weather) getArguments().getSerializable("weather");
         initData();  //开启线程进行网络请求,更新后不需要开启线程
         return view;
     }
@@ -131,16 +137,23 @@ public class FragmentWeather extends Fragment {
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                Log.d("scrollListener",String.valueOf(scrollY));
+//                Log.d("scrollListener",String.valueOf(scrollY));
                 if (scrollY < 360){
-                    relativeLayout.setBackgroundColor(Color.argb(255*scrollY/613,0,0,0));
+                    swipeRefreshLayout.setBackgroundColor(Color.argb(255*scrollY/613,0,0,0));
                     ((MainActivity)getActivity()).setAlpha(255*scrollY/613);
                 }
             }
         });
+        swipeRefreshLayout = view.findViewById(R.id.fg_weather_srl);
+        swipeRefreshLayout.setNestedScrollingEnabled(true);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateWeatherData(weather.getCity());
+            }
+        });
     }
     private void initData(){
-        weather = (Weather) getArguments().getSerializable("weather");
         DailyWeather today = weather.getForecast().get(1);
         textViewTemperature.setText(weather.getWendu());
         if (weather.getAqi().equals("无")){
@@ -157,7 +170,7 @@ public class FragmentWeather extends Fragment {
         textViewLunarDate.setText(String.format(getResources().getString(R.string.lunardate),month,day,week,lunar.getMonthAndDay()));
         textViewSituation.setText(today.getType());
         ChartUtils.initChart(lineChart,weather);
-        ChartUtils.setChartData(getActivity().getApplicationContext(),lineChart,weather);
+        ChartUtils.setChartData(getActivity(),lineChart,weather);
 
         textViewThird.setText(Utils.getWeekByString(weather.getForecast().get(2).getDate()));
         textViewForth.setText(Utils.getWeekByString(weather.getForecast().get(3).getDate()));
@@ -231,6 +244,56 @@ public class FragmentWeather extends Fragment {
 //        }.start();
     }
 
+    //更新天气数据
+    private void updateWeatherData(final String cityName){
+        new Thread(){
+            @Override
+            public void run() {
+                String url = "http://wthrcdn.etouch.cn/weather_mini?city="+cityName;
+                OkHttpClient okHttpClient = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                Response response = null;
+                try {
+                    response = okHttpClient.newCall(request).execute();
+                    String json = response.body().string();
+                    Weather weatherTemp = Utils.Json2Weather(json);  //构造weather对象，
+                    weatherTemp.setId(weather.getId());
+                    for (int i=0;i<6;i++){
+                        weatherTemp.getForecast().get(i).update(weather.getForecast().get(i).getId()); //先更新每日天气表
+                    }
+                    weatherTemp.update(weather.getId()); //再更新总表
+                    weather = LitePal.find(Weather.class,weather.getId(),true);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+//                            ChartUtils.setChartData(getActivity(),lineChart,weather);  //更新折线图数据
+                            updateView();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("weather",weather);
+                            ((MainActivity)getActivity()).updateFragment(bundle);
+                            Toast.makeText(getActivity(),"刷新天气信息成功",Toast.LENGTH_SHORT).show();
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                } catch (IOException e) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(),"刷新天气信息失败",Toast.LENGTH_SHORT).show();
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+    //更新视图
+    private void updateView(){
+        initData();
+    }
     //设置滑动位置
     public void setScrollTo(int y){
         scrollView.setScrollY(y);
@@ -241,11 +304,11 @@ public class FragmentWeather extends Fragment {
     }
     //获取当前天气卡片背景透明度
     public Drawable getAlpha(){
-        return relativeLayout.getBackground();
+        return swipeRefreshLayout.getBackground();
     }
     //设置背景透明度
     public void setAlpha(Drawable drawable){
-        relativeLayout.setBackground(drawable);
+        swipeRefreshLayout.setBackground(drawable);
     }
 
 }

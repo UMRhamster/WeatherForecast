@@ -7,11 +7,18 @@
     <string name="tipContentNet">抱歉！连接网络失败，请您查看您的网络设置，WLAN用户请检查您是否获得了访问权限。</string>
     <string name="tipContentWeather">抱歉！暂无您所选择地区的天气预报，建议选择市级城市查看天气预报。</string>
     <string name="tipContentUnknow">抱歉！发生了未知错误。</string>
+    <string name="askLocation">检测到当前城市%1$s,该城市尚未加入天气预报，是否加入？</string>
     <string name="queding">确定</string>
+    <string name="quxiao">取消</string>
     <string name="today">今天</string>
     <string name="yesterday">昨天</string>
     <string name="temperature">°</string>
     <string name="aqi">当前空气质量指数：%1$s</string>
     <string name="aqiNo">暂无该地区空气质量指数</string>
     <string name="date">%1$s/%2$s</string>
+
+    <string name="edit">编辑</string>
+    <string name="cityManagement">城市管理</string>
+    <string name="add">+</string>
+    <string name="city">城市</string>
 </resources>

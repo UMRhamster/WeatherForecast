@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.whut.umrhamster.weatherforecast.Model.NetWorkUtils;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
 import com.whut.umrhamster.weatherforecast.Model.Weather;
+import com.whut.umrhamster.weatherforecast.Model.WeatherUtils;
 import com.whut.umrhamster.weatherforecast.R;
 
 import org.litepal.LitePal;
@@ -34,6 +36,7 @@ import java.util.List;
 public class CitySearchActivity extends AppCompatActivity {
     private Button buttonMoreCity;
     private EditText editTextSearch;
+    private ImageView imageViewBack;
 
     private RecyclerView recyclerView;
     private List<Object> objectList;
@@ -59,6 +62,7 @@ public class CitySearchActivity extends AppCompatActivity {
 
     private void initView(){
         context = this;
+        imageViewBack = findViewById(R.id.ac_citysearch_back_iv);
         buttonMoreCity = findViewById(R.id.ac_citysearch_morecity_btn);
         editTextSearch = findViewById(R.id.ac_citychoose_et);
         recyclerView = findViewById(R.id.ac_citysearch_rv);
@@ -71,6 +75,7 @@ public class CitySearchActivity extends AppCompatActivity {
             gridLayout.getChildAt(i).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View view) {
+
                     //热门城市点击事件
                     new Thread(new Runnable() {
                         @Override
@@ -82,6 +87,16 @@ public class CitySearchActivity extends AppCompatActivity {
                                     public void run() {
                                         TipDialog tipDialog = new TipDialog(context,getResources().getString(R.string.tipContentNet));
                                         tipDialog.show();
+                                    }
+                                });
+                                return;
+                            }
+                            //检查是否已有改城市
+                            if (WeatherUtils.hasCity(((TextView)view).getText().toString())){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context,"您已添加过"+((TextView)view).getText()+",请选择其它城市",Toast.LENGTH_SHORT).show();
                                     }
                                 });
                                 return;
@@ -136,11 +151,21 @@ public class CitySearchActivity extends AppCompatActivity {
                                 });
                                 return;
                             }
+                            //检查是否已有改城市
+                            if (WeatherUtils.hasCity(((District) objectList.get(position)).getDistrictName())){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(context,"您已添加过"+((District) objectList.get(position)).getDistrictName()+",请选择其它城市",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
+                            }
                             //再检查是否有该城市的天气预报
                             if (Utils.hasWeather(((District) objectList.get(position)).getDistrictName())){
                                 Intent intent = new Intent();
                                 intent.putExtra("cityName",((District) objectList.get(position)).getDistrictName());
-                                setResult(4,intent);
+                                setResult(6,intent);
                                 finish();
                             }else {
                                 handler.post(new Runnable() {
@@ -163,6 +188,12 @@ public class CitySearchActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
     private void initEvent(){
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
         buttonMoreCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

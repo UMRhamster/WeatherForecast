@@ -9,7 +9,9 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/citySearchtb">
         <ImageView
+            android:contentDescription="@null"
             android:id="@+id/fg_district_back_iv"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:clickable="true"

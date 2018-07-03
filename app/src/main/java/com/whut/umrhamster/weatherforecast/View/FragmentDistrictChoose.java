@@ -24,6 +24,7 @@ import com.whut.umrhamster.weatherforecast.Model.District;
 import com.whut.umrhamster.weatherforecast.Model.NetWorkUtils;
 import com.whut.umrhamster.weatherforecast.Model.Province;
 import com.whut.umrhamster.weatherforecast.Model.Utils;
+import com.whut.umrhamster.weatherforecast.Model.WeatherUtils;
 import com.whut.umrhamster.weatherforecast.R;
 
 import org.litepal.LitePal;
@@ -100,6 +101,16 @@ public class FragmentDistrictChoose extends Fragment {
                                 });
                                 return;
                             }
+                            //检查是否已有改城市
+                            if (WeatherUtils.hasCity(((District) objectList.get(position)).getDistrictName())){
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getActivity(),"您已添加过"+((District) objectList.get(position)).getDistrictName()+",请选择其它城市",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
+                            }
                             //再检查是否有该城市的天气预报
                             if (Utils.hasWeather(((District) objectList.get(position)).getDistrictName())){
                                 Intent intent = new Intent();
@@ -137,7 +148,16 @@ public class FragmentDistrictChoose extends Fragment {
                             });
                             return;
                         }
-//                        Log.d("asfadfsdfsf","线程是否还在执行");
+                        //检查是否已有改城市
+                        if (WeatherUtils.hasCity(((District) objectList.get(position)).getDistrictName())){
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(),"您已添加过"+((District) objectList.get(position)).getDistrictName()+",请选择其它城市",Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
+                        }
                         //再检查是否有改城市的天气预报
                         if (Utils.hasWeather(districtList.get(position).getDistrictName())){
                             Intent intent = new Intent();

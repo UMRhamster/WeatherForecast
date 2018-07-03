@@ -10,4 +10,5 @@
     <color name="defaultColor">#fafafa</color>
     <color name="hotCityTextColor">#363636</color>
     <color name="hotCityTextColorChoosen">#b8b8b8</color>
+    <color name="textDarker">#404145</color>
 </resources>

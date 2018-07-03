@@ -24,7 +24,7 @@
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/weather"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -48,7 +48,12 @@
 
         <activity android:name=".View.CitySearchActivity" />
         <activity android:name=".View.CityChooseActivity" />
-        <activity android:name=".View.WeatherManagementActivity"></activity>
+        <activity android:name=".View.WeatherManagementActivity" />
+
+        <service
+            android:name=".Controller.UpdateService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

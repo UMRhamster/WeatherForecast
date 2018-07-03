@@ -2,6 +2,8 @@ package com.whut.umrhamster.weatherforecast.Model;
 
 import com.whut.umrhamster.weatherforecast.R;
 
+import org.litepal.LitePal;
+
 /**
  * Created by 12421 on 2018/6/18.
  */
@@ -64,5 +66,9 @@ public class WeatherUtils {
             default:
                 return R.mipmap.main_bg;
         }
+    }
+
+    public static boolean hasCity(String cityName){
+        return LitePal.isExist(Weather.class,"city = ?",cityName);
     }
 }
