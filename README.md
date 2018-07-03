@@ -1,6 +1,6 @@
 WeatherForcast
 ====
-天气预报
+[天气预报](https://github.com/UMRhamster/WeatherForecast/blob/master/app/release/app-release.apk)
 ## 1.界面显示 ##
 <table>
 <tr>
