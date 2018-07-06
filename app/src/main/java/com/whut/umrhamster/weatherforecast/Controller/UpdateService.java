@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
@@ -15,20 +16,26 @@ import org.litepal.LitePal;
 import java.io.IOException;
 import java.util.List;
 
+import interfaces.heweather.com.interfacesmodule.bean.basic.Update;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class UpdateService extends Service {
+    private OnUpdateListener onUpdateListener;
     public UpdateService() {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+       return new UpdateBinder();
     }
 
+    public class UpdateBinder extends Binder{
+        public UpdateService getService(){
+            return UpdateService.this;
+        }
+    }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 //        Log.d("UpdateService","onStartCommand");
@@ -67,7 +74,20 @@ public class UpdateService extends Service {
                         e.printStackTrace();
                     }
                 }
+                while (true){
+                    if (onUpdateListener != null){
+                        Log.d("dsad","更新");
+                        onUpdateListener.onUpdate();
+                        break;
+                    }
+                }
             }
         }).start();
+    }
+    public void setOnUpdateListener(OnUpdateListener onUpdateListener){
+        this.onUpdateListener = onUpdateListener;
+    }
+    public interface OnUpdateListener{
+        void onUpdate();
     }
 }

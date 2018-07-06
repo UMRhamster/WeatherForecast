@@ -1,11 +1,14 @@
 package com.whut.umrhamster.weatherforecast;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -66,6 +69,30 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
 
     Handler handler = new Handler();
+
+    private UpdateService updateService;
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            updateService = ((UpdateService.UpdateBinder)iBinder).getService();
+            updateService.setOnUpdateListener(new UpdateService.OnUpdateListener() {
+                @Override
+                public void onUpdate() {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateWeather();
+                        }
+                    });
+                }
+            });
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             Utils.initAllCitys();
         }
         Intent intent = new Intent(this, UpdateService.class);
+        bindService(intent,connection,BIND_AUTO_CREATE);
         startService(intent);
 //        LitePal.deleteAll(Weather.class);
 //        LitePal.deleteAll(DailyWeather.class);
@@ -298,9 +326,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 3 && resultCode == 4){
             getWeatherData(data.getStringExtra("cityName"));
-//            addFragment(data.getStringExtra("cityName"));
         }
         if (requestCode == 3 && resultCode == 7){
+            Log.d("dasdas","dasdasda");
             updateWeather();
         }
     }
@@ -346,4 +374,10 @@ public class MainActivity extends AppCompatActivity {
         myFragmentPagerView.notifyDataSetChanged();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(connection);
+        stopService(new Intent(this,UpdateService.class));
+    }
 }

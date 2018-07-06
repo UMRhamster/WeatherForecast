@@ -142,19 +142,53 @@ public class WeatherManagementActivity extends AppCompatActivity {
         }.start();
     }
 
+
+    private void addWeater(final String cityName){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String url = "http://wthrcdn.etouch.cn/weather_mini?city="+cityName;
+                OkHttpClient okHttpClient = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .build();
+                Response response = null;
+                try {
+                    response = okHttpClient.newCall(request).execute();
+                    String json = response.body().string();
+                    final Weather weather = Utils.Json2Weather(json);  //构造weather对象，
+                    for (int i=0;i<6;i++){
+                        weather.getForecast().get(i).save();
+                    }
+                    weather.save();
+                    weatherList.add(weather); //添加到集合中
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyItemChanged(weatherList.size()-1);
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 5 && resultCode == 6){
-            setResult(4,data);
-            finish();
+//            setResult(4,data);
+//            finish();
+            addWeater(data.getStringExtra("cityName"));
+
         }
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         setResult(7);
+        super.onBackPressed();
 //        Log.d("WeatherManagement","hello");
         overridePendingTransition(R.anim.anim_fg_back_enter,R.anim.anim_fg_back_out);
     }
